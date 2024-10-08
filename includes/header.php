@@ -43,7 +43,7 @@ if ($result_trending && $result_trending->num_rows > 0) {
                 </button>
                 <div class="nav-item logo">
                     <a class="logo" href="index.php">
-                        <img alt="Logo" src="assets/image/logo.png"/>
+                        <img alt="Logo" src="assets/image/logo.png" />
                     </a>
                 </div>
                 <div class="nav-items">
@@ -58,17 +58,17 @@ if ($result_trending && $result_trending->num_rows > 0) {
                     <!-- Logo -->
                     <li class="nav-item logo">
                         <a class="nav-link123" href="index.php">
-                            <img alt="Logo" class="logo-img" src="assets/image/logo.png"/>
+                            <img alt="Logo" class="logo-img" src="assets/image/logo.png" />
                         </a>
                     </li>
                 </ul>
             </div>
         </div>
-        <input class="timkiem search-input" id="searchContainer" onkeypress="handleKeyPress(event)" placeholder="Tìm kiếm..." style="display: none;" type="text"/>
+        <input class="timkiem search-input" id="searchContainer" onkeypress="handleKeyPress(event)" placeholder="Tìm kiếm..." style="display: none;" type="text" />
         <ul class="nav-list">
             <li class="nav-item logo">
                 <a class="logo" href="index.php">
-                    <img alt="Logo" src="assets/image/logo.png"/>
+                    <img alt="Logo" src="assets/image/logo.png" />
                 </a>
             </li>
             <li class="nav-item">
@@ -80,7 +80,7 @@ if ($result_trending && $result_trending->num_rows > 0) {
                     <?php if (!empty($types)): ?>
                         <?php foreach ($types as $type): ?>
                             <li>
-                                <a href="filter.php?type_id=<?= urlencode($type['type_id']); ?>">
+                                <a href="filter.php?type_id=<?= urlencode($type['type_id']); ?>&type_name=<?= htmlspecialchars($type['type_name']); ?>">
                                     <?= htmlspecialchars($type['type_name']); ?>
                                 </a>
                             </li>
@@ -103,23 +103,15 @@ if ($result_trending && $result_trending->num_rows > 0) {
                 </ul>
             </li>
             <li class="nav-item-search-box">
-                <input class="timkiem search-input" id="searchInput" onkeypress="handleKeyPress(event)" placeholder="Tìm kiếm..." type="text"/>
+                <input class="timkiem search-input" id="searchInput" onkeypress="handleKeyPress(event)" placeholder="Tìm kiếm..." type="text" />
                 <button class="button-timkiem search-button" onclick="search()" type="button">
                     <i class="fa-solid fa-magnifying-glass"></i>
                 </button>
             </li>
             <li class="nav-item">
-                <?php if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true): ?>
-                    <a class="nav-link" href="profile.php">
-                        <?= htmlspecialchars($_SESSION['fullname']); ?> <!-- Hiển thị tên người dùng đã đăng nhập -->
-                    </a>
-                <?php else: ?>
-                    <a class="nav-link" href="login.php">Đăng Nhập</a>
-                <?php endif; ?>
+                <a class="nav-link" href="login.php">Đăng Nhập</a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" href="register.php">Đăng Kí</a>
-            </li>
+
         </ul>
     </nav>
 </header>
