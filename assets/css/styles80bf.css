@@ -764,7 +764,7 @@ textarea {
     z-index: 1000; /* Giá trị z-index lớn hơn các phần tử xung quanh */
     display: none;
     padding: 15px;
-
+    width: 350px;
 }
 
 /* Thêm phần này để ẩn/mở form khi cần thiết */
