@@ -91,67 +91,56 @@ $result = $conn->query($query);
 
 <body>
 
-    <div class="sidebar">
-        <h2>Navigation</h2>
-
+     <!-- Sidebar -->
+     <div class="sidebar">
+        <a href="../index.php"><h2>Dashboard</h2></a>
         <!-- Accounts Section -->
         <div class="toggle-btn" onclick="toggleMenu('accounts-menu')">
-            <span>Accounts</span>
+            <span>Tài Khoản</span>
             <span>&#9660;</span>
         </div>
         <ul id="accounts-menu">
-            <li><a href="../accounts/index.php">View Accounts</a></li>
-            <li><a href="../accounts/create.php">Create Account</a></li>
-            <!-- <li><a href="../accounts/delete.php">Delete Account</a></li>
-            <li><a href="../accounts/edit.php">Edit Account</a></li> -->
+            <li><a href="../accounts/index.php">Quản Lý Tài Khoản</a></li>
+            <li><a href="../accounts/create.php">Tạo Tài Khoản</a></li>
         </ul>
 
         <!-- Manga Section -->
         <div class="toggle-btn" onclick="toggleMenu('manga-menu')">
-            <span>Manga</span>
+            <span>Truyện</span>
             <span>&#9660;</span>
         </div>
         <ul id="manga-menu">
-            <li><a href="../manga/index.php">View Manga</a></li>
-            <li><a href="../manga/create.php">Create Manga</a></li>
-            <!-- <li><a href="../manga/delete.php">Delete Manga</a></li>
-            <li><a href="../manga/edit.php">Edit Manga</a></li> -->
+            <li><a href="../manga/index.php">Danh Sách Truyện</a></li>
+            <li><a href="../manga/create.php">Thêm Mới Truyện</a></li>
         </ul>
 
         <!-- Manga Type Section -->
         <div class="toggle-btn" onclick="toggleMenu('manga-type-menu')">
-            <span>Manga Type</span>
+            <span>Thể Loại Truyện</span>
             <span>&#9660;</span>
         </div>
         <ul id="manga-type-menu">
-            <li><a href="../manga_type/index.php">View Manga Types</a></li>
-            <li><a href="../manga_type/create.php">Create Manga Type</a></li>
-            <!-- <li><a href="../manga_type/delete.php">Delete Manga Type</a></li>
-            <li><a href="../manga_type/edit.php">Edit Manga Type</a></li> -->
+            <li><a href="../manga_type/index.php">Loại Truyện</a></li>
+            <li><a href="../manga_type/create.php">Thêm Mới</a></li>
         </ul>
 
         <!-- Trending Section -->
         <div class="toggle-btn" onclick="toggleMenu('trending-menu')">
-            <span>Trending</span>
+            <span>Danh Mục Trending</span>
             <span>&#9660;</span>
         </div>
-        <ul id="trending-menu">
-            <li><a href="../trending/index.php">View Trending</a></li>
-            <li><a href="../trending/create.php">Create Trending</a></li>
-            <!-- <li><a href="../trending/delete.php">Delete Trending</a></li>
-            <li><a href="../trending/edit.php">Edit Trending</a></li> -->
-        </ul>
+        <a href="../logout.php">Đăng Xuất</a>
     </div>
 
     <div class="content">
-        <h1>Trending List</h1>
-        <a class="ms-130 btn btn-success" href="create.php">Create New Trending</a>
+        <h1>Danh Sách Danh Mục Trending</h1>
+        <a class="btn btn-success" href="create.php">Thêm Mới Danh Mục Trending</a>
 
-        <table border="1">
+        <table class="table" border="1">
             <thead>
                 <tr>
-                    <th>Trending Name</th>
-                    <th>Actions</th>
+                    <th>Tên Danh Mục Trending</th>
+                    <th>Hành Động</th>
                 </tr>
             </thead>
             <tbody>
@@ -159,8 +148,8 @@ $result = $conn->query($query);
                     <tr>
                         <td><?= $row['trending_name'] ?></td>
                         <td>
-                            <a href="edit.php?id=<?= $row['trending_id'] ?>">Edit</a>
-                            <a href="delete.php?id=<?= $row['trending_id'] ?>" onclick="return confirm('Are you sure?')">Delete</a>
+                            <a href="edit.php?id=<?= $row['trending_id'] ?>" class="btn btn-warning">Sửa</a>
+                            <a href="delete.php?id=<?= $row['trending_id'] ?>" onclick="return confirm('Are you sure?')" class="btn btn-danger">Xóa</a>
                         </td>
                     </tr>
                 <?php endwhile; ?>
