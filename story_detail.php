@@ -9,7 +9,37 @@ $result;
 if ($manga_result->num_rows > 0) {
     $result = $manga_result->fetch_assoc();
 }
-$updateAtDate = new DateTime($result['update_at']);
+
+// select chapter
+$chapter_id = isset($_GET['chapter_id']) ? $_GET['chapter_id'] : null;
+$queryChapter = "select * from chapter where chapter_id = $chapter_id";
+$stmtChapter = $conn->prepare($queryChapter);
+$stmtChapter->execute();
+$chapter_result = $stmtChapter->get_result();
+$chapter;
+
+if ($chapter_result->num_rows > 0) {
+    $chapter = $chapter_result->fetch_assoc();
+}
+
+// set datetime
+$updateAtDate = new DateTime($chapter['update_at']);
+
+
+// select all chapter of a manga
+$queryAllChapter = "SELECT * FROM chapter WHERE manga_id = $manga_id";
+$stmtAllChapter = $conn->prepare($queryAllChapter);
+$stmtAllChapter->execute();
+$result_chapters = $stmtAllChapter->get_result();
+
+// Khởi tạo một mảng để chứa tất cả các chương
+$chapters = [];
+
+// Fetch tất cả các chương vào mảng
+while ($row = $result_chapters->fetch_assoc()) {
+    $chapters[] = $row;
+}
+
 ?>
 
 
@@ -37,25 +67,6 @@ $updateAtDate = new DateTime($result['update_at']);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chờ Em Đào Hôn Lâu Lắm Rồi</title>
     <meta property="og:title" content="Chờ Em Đào Hôn Lâu Lắm Rồi" />
-    <meta property="og:description" content="Edit: Bản dịch độc quyền và duy nhất tại Talespot.
-Văn Án:
-Trường trung học số hai chào đón một học bá trông có vẻ ngoan hiền, vừa đến đã chiếm giữ vị trí đầu bảng.
-Eo thon, chân dài, sạch sẽ xinh đẹp như một bức tranh.
-Lạnh lùng, nhàm chán, xa cách hờ hững, người lạ chớ đến gần.
-Học sinh chuyển trường đến được một tháng.
-Bạn cùng lớp huých vai Tạ Tinh Lan: &quot;Này, cậu thấy Hạ Khâm thế nào?&quot;
-Tạ Tinh Lan liếc nhìn Hạ Khâm.
-Vẻ bất cần đời: &quot;Ngoài khuôn mặt ra thì chẳng có gì hay ho, là một tên mọt sách chính hiệu.&quot;
-Sau đó, vào một ngày nọ.
-Anh và Hạ Khâm bị một đám côn đồ chặn đường ở cổng sau trường.
-Tạ Tinh Lan chứng kiến Hạ Khâm không hề thay đổi sắc mặt cho đám côn đồ ba cái tát.
-Tiếng tát vang lên từng tiếng một, đánh cho đám côn đồ không kịp trở tay.
-Khuôn mặt thường ngày lạnh lùng của Hạ Khâm thốt ra hai chữ: &quot;Đau không?&quot;
-Đám côn đồ run rẩy: &quot;Không, không đau.&quot;
-Hạ Khâm lạnh nhạt: &quot;Vậy sao. Nhưng tôi đau.&quot;
-Cậu giơ tay, đưa đầu ngón tay ửng đỏ đến trước mặt Tạ Tinh Lan: &quot;Thổi cho tôi.&quot;
-Tạ Tinh Lan: &quot;...&quot;
-Mẹ kiếp, vợ tôi ngầu thật." />
     <meta property="og:image" content="https://res.cloudinary.com/deam5w1nh/image/upload/v1725960942/ganscwajrhjzja7eerrx.png" />
     <meta property="og:url" content="https://truyentalespot.com/index.php?quanly=thongtintruyen&amp;id_truyen=108&amp;id_chuong=11309" />
     <script async src="../pagead2.googlesyndication.com/pagead/js/f26c4.txt?client=ca-pub-9357006487999643"
@@ -67,9 +78,63 @@ Mẹ kiếp, vợ tôi ngầu thật." />
     <link rel="stylesheet" href="../cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" />
     <link rel="shortcut icon" type="image/png" href="assets/image/logo.ico">
     <meta name="google-signin-client_id" content="903289929360-7umpc2inp7iov7sbsmnrmpiai16onig9.apps.googleusercontent.com">
+    <style>
+        .comment-item {
+            display: flex;
+            align-items: flex-start;
+            /* Căn giữa theo chiều dọc */
+            background-color: #f9f9f9;
+            /* Màu nền sáng */
+            border: 1px solid #e1e1e1;
+            /* Đường viền xung quanh */
+            border-radius: 8px;
+            /* Bo góc */
+            padding: 10px;
+            /* Khoảng đệm bên trong */
+            margin-bottom: 10px;
+            /* Khoảng cách giữa các bình luận */
+            transition: background-color 0.3s;
+            /* Hiệu ứng chuyển đổi màu nền */
+        }
+
+        .comment-item:hover {
+            background-color: #f0f0f0;
+            /* Màu nền khi hover */
+        }
+
+        .comment-avatar {
+            margin-right: 10px;
+            /* Khoảng cách giữa avatar và nội dung bình luận */
+        }
+
+        .comment-avatar img {
+            border-radius: 50%;
+            /* Bo tròn avatar */
+            object-fit: cover;
+            /* Cắt ảnh để giữ tỷ lệ */
+        }
+
+        .comment-content {
+            flex: 1;
+            /* Chiếm toàn bộ không gian còn lại */
+        }
+
+        .comment-content p {
+            /* padding-bottom: 10px; */
+            /* Bỏ margin cho p */
+            margin-top: 5px;
+            color: #333;
+            /* Màu chữ bình luận */
+            line-height: 1.4;
+            /* Khoảng cách giữa các dòng */
+        }
+
+        .comment-content h4 {
+            margin-top: 0;
+            margin-bottom: 0;
+        }
+    </style>
 </head>
-
-
 
 <body>
     <?php
@@ -240,19 +305,51 @@ Mẹ kiếp, vợ tôi ngầu thật." />
                             </select>
                         </div>
                         <div class="chapter-info">
-                            <div class="prev-chapter"></div>
-                            <div class="next-chapter"><a href='indexc1ab.html?quanly=doc&amp;id_truyen=108&amp;id_chuong=11318'>Sau <i class='fas fa-arrow-right'></i></a></div>
+                            <div class="prev-chapter">
+                                <?php
+
+                                $currentChapterId = intval($_GET['chapter_id']);
+                                // Tìm vị trí của chương hiện tại trong mảng
+                                $currentChapterIndex = array_search($currentChapterId, array_column($chapters, 'chapter_id'));
+
+                                if ($currentChapterIndex !== false && $currentChapterIndex != 0) {
+                                ?>
+                                    <a href='story_detail.php?manga_id=<?php echo $_GET['manga_id']; ?>&chapter_id=<?php echo $chapters[$currentChapterIndex - 1]['chapter_id'] ?>'>
+                                        Trước
+                                        <i class='fas fa-arrow-right'></i>
+                                    </a>
+                                <?php
+                                }
+                                ?>
+                            </div>
+                            <div class="next-chapter">
+                                <?php
+
+                                $currentChapterId = intval($_GET['chapter_id']);
+                                // Tìm vị trí của chương hiện tại trong mảng
+                                $currentChapterIndex = array_search($currentChapterId, array_column($chapters, 'chapter_id'));
+
+                                if ($currentChapterIndex !== false && $currentChapterIndex < count($chapters) - 1) {
+                                ?>
+                                    <a href='story_detail.php?manga_id=<?php echo $_GET['manga_id']; ?>&chapter_id=<?php echo $chapters[$currentChapterIndex + 1]['chapter_id'] ?>'>
+                                        Sau
+                                        <i class='fas fa-arrow-right'></i>
+                                    </a>
+                                <?php
+                                }
+                                ?>
+                            </div>
                             <div class="settings-menu">
                                 <div id="settingsIcon" class="settings-icon" onclick="toggleSettingsPanel()"><i class="fa-solid fa-gear"></i> Tùy chỉnh</div>
                                 <div id="chapterIcon" class="chapter-icon" onclick="toggleChapterModal()"><i class="fa-solid fa-list-ul"></i> Mục lục</div>
                                 <div id="bookmarkIcon" class="bookmark-icon" onclick="alert('Vui lòng đăng nhập để đánh dấu.');"><i class="fa-solid fa-bookmark"></i> Đánh dấu</div>
                             </div>
                             <h2><a class="tentieude" href="story.php?manga_id=<?php echo $_GET['manga_id']; ?>"><?php echo $result['manga_name']; ?></a></h2>
-                            <h3 class="chuong_ten">Chương 1: Chương 1: Chuyển trường</h3><i class="chuong_ten">Ngày cập nhật : <?php echo  $updateAtDate->format('d-m-Y'); ?></i>
+                            <h3 class="chuong_ten"><?php echo $chapter['chapter_name']; ?></h3><i class="chuong_ten">Ngày cập nhật : <?php echo  $updateAtDate->format('d-m-Y'); ?></i>
                             <div id="chapterModal" class="chapter-modal" style="display: none;">
                                 <div class="chapter-modal-content"><span class="close" onclick="toggleChapterModal()">&times;</span>
-                                    <h2><a class="tentieude" href="index18f1.html?quanly=thongtintruyen&amp;id_truyen=108">Chờ Em Đào Hôn Lâu Lắm Rồi</a></h2>
-                                    <h3 class="chuong_ten">Chương 1: Chương 1: Chuyển trường</h3>
+                                    <h2><a class="tentieude" href="story.php?manga_id=<?php echo $_GET['manga_id']; ?>"><?php echo $result['manga_name']; ?></a></h2>
+                                    <h3 class="chuong_ten"><?php echo $result['manga_name']; ?></h3>
                                     <div class="chapter-order-icons"><span class="order-icon" onclick="loadChapters('asc')">&#x25B2;</span><span class="order-icon" onclick="loadChapters('desc')">&#x25BC;</span></div>
                                     <div id="chapterListContainer">
                                         <script>
@@ -281,28 +378,20 @@ Mẹ kiếp, vợ tôi ngầu thật." />
                                             loadChapters("desc");
                                         </script>
                                         <ul class="chapter-list">
-                                            <li class="current-chapter"><a href="index3833.html?quanly=doc&amp;id_truyen=108&amp;id_chuong=11309">Chương 1: Chương 1: Chuyển trường</a></li>
-                                            <li class="chapter-item"><a href="indexc1ab.html?quanly=doc&amp;id_truyen=108&amp;id_chuong=11318">Chương 2: </a></li>
-                                            <li class="chapter-item"><a href="indexf0dd.html?quanly=doc&amp;id_truyen=108&amp;id_chuong=11350">Chương 3: Gâu</a></li>
-                                            <li class="chapter-item"><a href="index4ba2.html?quanly=doc&amp;id_truyen=108&amp;id_chuong=11352">Chương 4: Tình cờ chạm mặt</a></li>
-                                            <li class="chapter-item"><a href="index0066.html?quanly=doc&amp;id_truyen=108&amp;id_chuong=11389">Chương 5: Sổ uyên ương</a></li>
-                                            <li class="chapter-item"><a href="index2cf1.html?quanly=doc&amp;id_truyen=108&amp;id_chuong=11425">Chương 6: Chiến tranh lạnh</a></li>
-                                            <li class="chapter-item"><a href="indexec79.html?quanly=doc&amp;id_truyen=108&amp;id_chuong=11431">Chương 7: Tiêu chuẩn kép</a></li>
-                                            <li class="chapter-item"><a href="index427d.html?quanly=doc&amp;id_truyen=108&amp;id_chuong=11465">Chương 8: Đại ca</a></li>
-                                            <li class="chapter-item"><a href="index6128-2.html?quanly=doc&amp;id_truyen=108&amp;id_chuong=11466">Chương 9: Đánh nhau</a></li>
-                                            <li class="chapter-item"><a href="indexedb5.html?quanly=doc&amp;id_truyen=108&amp;id_chuong=11487">Chương 10: Số 88</a></li>
-                                            <li class="chapter-item"><a href="indexef48.html?quanly=doc&amp;id_truyen=108&amp;id_chuong=11509">Chương 11: Kẹo</a></li>
-                                            <li class="chapter-item"><a href="indexfdc8.html?quanly=doc&amp;id_truyen=108&amp;id_chuong=11527">Chương 12: Thích</a></li>
-                                            <li class="chapter-item"><a href="indexb46a.html?quanly=doc&amp;id_truyen=108&amp;id_chuong=11555">Chương 13: Cùng bàn</a></li>
-                                            <li class="chapter-item"><a href="index9fca.html?quanly=doc&amp;id_truyen=108&amp;id_chuong=11626">Chương 14: Quái vật</a></li>
-                                            <li class="chapter-item"><a href="index4411.html?quanly=doc&amp;id_truyen=108&amp;id_chuong=11627">Chương 15: Thơm</a></li>
-                                            <li class="chapter-item"><a href="indexded4.html?quanly=doc&amp;id_truyen=108&amp;id_chuong=11628">Chương 16: Thầy Hạ</a></li>
-                                            <li class="chapter-item"><a href="indexd616.html?quanly=doc&amp;id_truyen=108&amp;id_chuong=11629">Chương 17: Hormone adrenaline</a></li>
-                                            <li class="chapter-item"><a href="index2912.html?quanly=doc&amp;id_truyen=108&amp;id_chuong=11747">Chương 18: Thi đấu</a></li>
-                                            <li class="chapter-item"><a href="indexd923.html?quanly=doc&amp;id_truyen=108&amp;id_chuong=11748">Chương 19: Kiss</a></li>
-                                            <li class="chapter-item"><a href="index9c81.html?quanly=doc&amp;id_truyen=108&amp;id_chuong=11749">Chương 20: Mỹ nhân kế</a></li>
-                                            <li class="chapter-item"><a href="indexc69a.html?quanly=doc&amp;id_truyen=108&amp;id_chuong=11750">Chương 21: Hình mẫu lý tưởng</a></li>
-                                            <li class="chapter-item"><a href="index5d6a.html?quanly=doc&amp;id_truyen=108&amp;id_chuong=11751">Chương 22: Rất đẹp trai</a></li>
+                                            <?php
+                                            foreach ($chapters as $index => $a_chapter) {
+                                                // Kiểm tra xem chapter_id có bằng với chương hiện tại không
+                                                $is_current = ($a_chapter['chapter_id'] == $chapter_id);
+                                            ?>
+                                                <!-- <li class="current-chapter"><a href="index3833.html?quanly=doc&amp;id_truyen=108&amp;id_chuong=11309">Chương 1: Chương 1: Chuyển trường</a></li> -->
+                                                <li class="<?php echo $is_current ? 'current-chapter' : 'chapter-item' ?>">
+                                                    <a href="story_detail.php?manga_id=<?php echo $_GET['manga_id']; ?>&chapter_id=<?php echo $a_chapter['chapter_id'] ?>">Chương <?php echo $index + 1; ?>: <?php echo $a_chapter['chapter_name']; ?></a>
+                                                </li>
+                                                <!-- <li class="chapter-item"><a href="indexf0dd.html?quanly=doc&amp;id_truyen=108&amp;id_chuong=11350">Chương 3: Gâu</a></li>
+                                                <li class="chapter-item"><a href="index4ba2.html?quanly=doc&amp;id_truyen=108&amp;id_chuong=11352">Chương 4: Tình cờ chạm mặt</a></li> -->
+                                            <?php
+                                            }
+                                            ?>
                                         </ul>
                                     </div>
                                 </div>
@@ -319,141 +408,9 @@ Mẹ kiếp, vợ tôi ngầu thật." />
                                 }
                             </script>
                             <div class="chapter-content">
-                                <div class="content-text">Tháng tám ở Tây Thành, cái nóng vẫn chưa tan, khắp nơi trên đường phố vẫn thấy nhiều người đi đường mặc áo ngắn tay.<br />
-                                    Mùa hè ở các thành phố phía Nam luôn ẩm và oi bức, hai hôm trước đã có một trận mưa lớn, mặt đất ướt đến giờ vẫn chưa khô. Cổng trường Trường Trung học Số 2 Tây Thành nằm trên một vỉa hè cũ kỹ được lát gạch, vài học sinh mặc đồng phục lác đác đi qua đó.<br />
-                                    Hai bên tường có nhiều vết khắc được dán một lớp giấy báo chồng chéo lên nhau.<br />
-                                    Càng gần cổng trường càng thấy được bức tường cũ đã được vẽ graffiti một nửa, các loại tờ rơi quảng cáo nhỏ bay đầy trời.<br />
-                                    —— Thầy bói đây! Chỉ cần một phút là biết họ tên bạn!<br />
-                                    —— Biểu tượng hồi tâm chuyển ý hiệu quả hôm nay giảm giá, năm tệ một tấm, có thẻ học sinh giảm 20%!<br />
-                                    —— Tìm người ba Hoàng Kim! Người phù hợp: không giới hạn tuổi tác, cấp bậc tối thiểu trong game phải là Tinh Diệu!<br />
-                                    Quảng cáo cuối cùng còn kèm theo một ảnh chụp năm lần quỳ gối.<br />
-                                    Ở trên có một dòng chữ quảng cáo khiến người ta rơi nước mắt:<br />
-                                    “Hỗ trợ phục hưng hẻm núi, thắp sáng giấc mơ của hàng triệu trẻ em!”<br />
-                                    “Ba ba, ba ở đâu… Con ở hẻm núi muốn gặp ba lắm…”<br />
-                                    Tiếng ve kêu không dứt.<br />
-                                    Vào giờ nghỉ trưa, cổng trường Trường Trung học Số 2 mở trong nửa giờ, cho phép học sinh ra khu phố ăn vặt gần cổng mua bữa trưa.<br />
-                                    Nhiều nữ sinh mặc đồng phục ngồi trong quán trà sữa, lén lút lấy điện thoại ra lướt mạng xã hội. Lúc này, diễn đàn của Trường Trung học Số 2 đã bị một bức ảnh chụp lén làm cho náo loạn.<br />
-                                    Diễn đàn của Trường Trung học Số 2: Này, các anh em, trưa nay có một chiếc Rolls-Royce đậu trước cổng trường! Có bằng có chứng, đây là tiểu thư hay thiếu gia nhà nào đến học đây?<br />
-                                    Bình luận nối tiếp:<br />
-                                    “6666.”<br />
-                                    “Tôi thấy rồi, xe vẫn đậu ở đó.”<br />
-                                    “Có tin đồn nói là học sinh chuyển trường, hình như chuyển vào lớp thực nghiệm năm 2!”<br />
-                                    “Lớp thực nghiệm? Có thiếu gia nào nghĩ quẩn chuyển vào lớp thực nghiệm của trường mình thế, được sống thêm vài năm mà không muốn à……”<br />
-                                    ……<br />
-                                    Bức ảnh Rolls-Royce trên diễn đàn đã được chia sẻ hơn một nghìn lượt, nhưng chính chủ lại hoàn toàn không hay biết.<br />
-                                    Hạ Khâm mang một cái ba lô đen rỗng, bên tay phải là một chiếc vali, đứng yên lặng trước cửa phòng giáo vụ. Nhìn qua, cậu là một thiếu niên gầy gò. Dáng người thẳng tắp, nhưng không cao quá một mét tám. Tóc hơi dài, chỉ là đang đeo một cặp kính đen cồng kềnh, che khuất phần lớn vẻ đẹp của mình. Nếu quan sát kỹ, không khó để nhận ra cậu là một chàng trai đẹp trai hơi quá mức.<br />
-                                    WeChat liên tục hiện lên tin nhắn từ người bạn thời thơ ấu ở Bắc Kinh - Diêm Mạn. Cô dù cách xa hàng ngàn cây số, vẫn không ngừng lo lắng cho cậu. Voice chat được gửi đi từng cái một, mỗi cái đều dài hơn sáu mươi giây. Hạ Khâm nhìn xuống, hoàn toàn không mở ra, bình thản trả lời: [Biết rồi.]<br />
-                                    [Cậu biết gì rồi hả???] <br />
-                                    Diêm Mạn thấy phản hồi của cậu, lập tức gửi ba biểu tượng cảm xúc giận dữ. Có thể thấy cơn giận của cô rất lớn.<br />
-                                    [Cậu nghe thử xem tôi đã nói gì trong voice chat trước đó coi??] <br />
-                                    Hạ Khâm mở tin nhắn, giọng Bắc Kinh chuẩn của Diêm Mạn được phát ra: “Mẹ của mẹ gọi là bà ngoại, vậy ba của ba gọi là gì?”<br />
-                                    Hạ Khâm: “……”<br />
-                                    “Cậu có vấn đề. Gửi cái này cho tôi làm gì?” <br />
-                                    Diêm Mạn nghiêm túc đáp: [Để kiểm tra xem cậu có nghe kỹ voice chat của tôi không.]<br />
-                                    Hạ Khâm lại một lần nữa gửi đi sáu dấu chấm.<br />
-                                    Diêm nữ sĩ kiên trì nhắn tin, lần này toàn bộ đều là gõ chữ: [Anh Khâm, đừng lo lắng. Mặc dù cậu đã chuyển trường đến Tây Thành, nhưng linh hồn và tinh thần của cậu sẽ mãi mãi ở lại Trường Trung học Số 13 vĩ đại của chúng ta!]<br />
-                                    Hạ Khâm lười biếng đáp lại: [Nói tiếng người đi.]<br />
-                                    Diêm nữ sĩ: [Tiếng người là hãy chăm sóc bản thân thật tốt, chị em chờ cậu quay lại Bắc Kinh!]<br />
-                                    Diêm nữ sĩ do dự một chút, rồi nói tiếp: [Du Tỉnh từ khi cậu bỏ học đã luôn tìm hiểu xem cậu đi đâu, nhưng bọn mình không nói cho hắn biết, vì đàn ông tồi không đáng để quan tâm, những kẻ si tình cũng vậy (Mỉm cười).]<br />
-                                    Bất ngờ nhìn thấy tên của bạn trai cũ, Hạ Khâm dừng lại một chút, nhưng không có cảm xúc gì lớn lao.<br />
-                                    Dù cho "bạn trai cũ" này đã vu khống cậu gian lận, tuyên truyền rằng cậu "đồng tính", khiến cậu bị đuổi học và bị lưu đày từ thủ đô đến thành phố phía Nam có tên gọi "Tây Thành".<br />
-                                    Tính cách của Hạ Khâm dường như từ trong xương tủy đã toát lên một sự lạnh lẽo và thờ ơ, sự không tin tưởng vào người khác cũng được khắc sâu trong DNA của cậu. Du Tỉnh làm như vậy, cậu hoàn toàn không cảm thấy bất ngờ, cũng không cảm thấy buồn bã.<br />
-                                    Sự lạnh lẽo bẩm sinh đã cho cậu một khí chất lạnh lùng khó gần từ bên trong ra bên ngoài. Theo lời của Diêm nữ sĩ, cậu trông như thể căm ghét cả thế giới, đi qua chó cũng muốn đá một cái.<br />
-                                    Trong khung chat WeChat, Diêm nữ sĩ đã bắt đầu chuyển chủ đề một cách vụng về, thành những nội dung quan tâm đến thói quen ăn uống và sinh hoạt của cậu.<br />
-                                    “Ting ting” vài tiếng, tin nhắn mới lại hiện lên.<br />
-                                    Gửi từ một tài khoản ghi chú là "Mẹ".<br />
-                                    [Con đến trường chưa?]<br />
-                                    [Chủ nhiệm Hà sẽ tiếp đón con, đừng gây rắc rối.]<br />
-                                    [Thấy tin nhắn thì mau trả lời cho mẹ.]<br />
-                                    So với sự quan tâm của bạn bè, lời nói của người mẹ này có vẻ đặc biệt không khách khí, thậm chí còn lộ ra một chút khoảng cách.<br />
-                                    Hạ Nghiên đã gửi đi vài tin nhắn, có lẽ cảm thấy giọng điệu quá cứng nhắc, cuối cùng lại bổ sung một câu không tự nhiên: “Con một mình đi xa không an toàn, mẹ không yên tâm nên hỏi thêm vài câu. Mau chóng báo cáo, thời gian của chú Tưởng rất quý giá, chú ấy đã mệt mỏi vì chuyến công tác tới Tây Thành rồi còn phải đặc biệt đến tiễn con ——”<br />
-                                    m thanh bị Hạ Khâm đột ngột cắt đứt, cậu không muốn tiếp tục nghe Hạ Nghiên nói, chỉ một tay gõ tin nhắn trả lời: [Con biết rồi.]<br />
-                                    Chú Tưởng có tên đầy đủ là Tưởng Quyền, là ba dượng của cậu. Hạ Khâm không có khái niệm rõ ràng về ba, bởi vì nếu một người trong suốt mười bảy năm cuộc đời đã đổi bốn người ba, thì cho dù là ai cũng sẽ không có cảm xúc sâu sắc với danh phận này.<br />
-                                    Giả sử phải chọn một câu phù hợp nhất cho cậu, “cậu nghĩ bốn bể đều là ba cậu à”, Hạ Khâm cảm thấy mình xứng đáng với câu này.<br />
-                                    Cậu nhớ đến Tưởng Quyền, người này có chức vụ cao nhất, nhiều tiền nhất trong số những ứng cử viên của Hạ Nghiên và hiện đang giữ chức lâu nhất.<br />
-                                    Cái Rolls-Royce ở cổng trường chính là tài sản hùng hậu của người ba dượng thứ tư của cậu. Trước khi đến đây, Tưởng Quyền đã sắp xếp ổn thỏa với tất cả những người liên quan ở Trường Trung học Số 2 Tây Thành, lúc rời đi còn vỗ vai Hạ Khâm: “Học hành cho tốt, một thời gian nữa chú và mẹ sẽ đến thăm con.”<br />
-                                    “Không cần đâu, có chuyện gì thì cứ liên lạc qua chai nguyện ước rồi thả trôi theo nước nhé.”<br />
-                                    “Nhắn mẹ tôi nếu nhớ tôi thì gọi số của tôi, vẫn là số của Ngân hàng Xây dựng, không thay đổi.”<br />
-                                    Tưởng Quyền thực sự không biết nói gì, với thái độ của một người đàn ông trung niên, ông mở miệng nói, vừa nói đã lộ rõ vẻ cha chú: “Tiểu Khâm, con nhất định phải nói chuyện với chú như vậy sao?”<br />
-                                    Dù đã sống chung một năm, nhưng vẫn là những người quen thuộc mà xa lạ nhất.<br />
-                                    Hạ Khâm hơi ngạc nhiên: “Sao vậy, nói tiếng Anh thì được chứ.”<br />
-                                    Cậu nghiêm túc nói: “goodbyebyesb, chab (Ngân hàng Xây dựng Trung Quốc) nuberis——”<br />
-                                    Để tiết kiệm thời gian, Hạ Khâm quyết định chỉ dịch những điểm chính, số thì dùng tay chỉ thẳng, hình ảnh sống động vẽ ra một chuỗi ngôn ngữ ký hiệu.<br />
-                                    Khi chỉ đến chữ số thứ sáu của số thẻ ngân hàng, Tưởng Quyền cuối cùng không chịu nổi cái tên điên này, đến mức không nghe ra trong tiếng Anh kiểu Trung Quốc của Hạ Khâm còn lẫn một câu chửi ông là “sb”.<br />
-                                    Người đàn ông tức giận quay lưng lại, vung tay bỏ đi.<br />
-                                    Đi xa rồi, Hạ Khâm nghe thấy Tưởng Quyền lầm bầm chửi mình.<br />
-                                    “Không có trái tim, chỉ là một con sói mắt trắng không nuôi được.”<br />
-                                    “Giám đốc Tưởng, ngài còn trẻ, hay là xin phu nhân ngài thêm một đứa nữa đi.”<br />
-                                    Hạ Khâm vẫy tay: “Cố lên nhé, chú, thích làm ba như vậy, nhất định sẽ trở thành người ba tốt.”<br />
-                                    “BANG” một tiếng, đáp lại Hạ Khâm là cánh cửa xe bị đóng sập mạnh mẽ.<br />
-                                    Hạ Khâm đã hết kiên nhẫn nên thu hồi ánh mắt của mình. <br />
-                                    Thực ra, trợ lý của Tưởng Quyền nói không sai, cậu chính là một con sói mắt trắng không thể nuôi được. Nhưng cậu cũng không cầu xin ai nuôi mình, đúng không? <br />
-                                    Những người tự nguyện làm ba của cậu, cũng không nghĩ xem — <br />
-                                    Một đứa con trai xuất sắc hoàn hảo như vậy, liệu họ có thể sinh ra được không? <br />
-                                    Những người muốn làm ba của cậu đã xếp hàng từ Tây Thành đến Pháp rồi. <br />
-                                    Hạ Khâm theo thói quen đẩy kính đen lên, lôi vali đi về phía Phòng Chính trị Giáo dục. <br />
-                                    Người phụ trách dẫn cậu đi báo danh là Chủ nhiệm Hà, Trưởng phòng Chính trị Giáo dục - người nhỏ bé nhưng có giọng nói to như sấm, hoàn hảo thể hiện câu nói "tinh túy nằm ở sự cô đọng". <br />
-                                    Bản đồ cho thấy, để đến Phòng Chính trị Giáo dục còn phải đi qua một quảng trường dài trước trường. <br />
-                                    Khi Hạ Khâm kéo vali đi, đúng lúc là giờ lên lớp. Quảng trường trước trường không có nhiều người, nhưng có không ít học sinh trực nhật đang tò mò nhìn cậu. <br />
-                                    Hiện tại, cậu vẫn chưa biết mình đã nổi tiếng trên diễn đàn của Trường Trung học Số 2 Tây Thành. <br />
-                                    Thiết lập nhân vật của cậu là hoàng tử có bệnh đệ nhất thế giới tự mình đi học, còn có một người ba giàu có lái Rolls-Royce. <br />
-                                    Hạ Khâm không mấy để ý đến cảnh vật xung quanh, cũng không mấy tò mò về ngôi trường mà mình sắp theo học.<br />
-                                    Vì lý do Hạ Nghiên luôn tái hôn, Hạ Khâm không ở lại bất kỳ thành phố nào quá lâu. Việc đi học ở thành phố nào phụ thuộc vào việc Hạ Nghiên lại tìm thấy bạn trai mới ở thành phố nào. <br />
-                                    Trong chín năm giáo dục bắt buộc, cậu đã học ở mười ba trường, với tần suất chuyển trường cao đến mức có thể xin giải Nobel về chuyển trường, do Thượng tướng McArthur của Mỹ trao tặng. <br />
-                                    Sau một hồi suy nghĩ lung tung, Hạ Khâm đã đến trước cửa Phòng Chính trị Giáo dục. <br />
-                                    Những ngày gần đây, nhiệt độ ở Tây Thành lại lập kỷ lục mới, đạt mức 40 độ. Phòng Chính trị Giáo dục mở điều hòa, cửa hơi khép, Hạ Khâm gõ nhẹ vào cửa, cánh cửa tự động mở ra. <br />
-                                    Không khí lạnh ập vào, xua tan cơn nóng trong lòng cậu. <br />
-                                    Gió từ điều hòa thổi ào ào, có thể thấy nó khá cũ kỹ. <br />
-                                    Căn phòng quay về phía nam, đúng giờ lên lớp, toàn bộ Phòng Chính trị Giáo dục vắng vẻ, trên cửa sổ kính màu vàng nhạt là những cây thường xuân xanh tươi, phong cách điển hình của Tây Thành. <br />
-                                    Hạ Khâm liếc nhìn trong phòng, chỉ thấy một thầy giáo trẻ ngồi ở vị trí bên phải, đang viết với tốc độ nhanh. <br />
-                                    “Em chào thầy.” Hạ Khâm lịch sự lên tiếng. <br />
-                                    Thầy giáo trẻ nghe thấy tiếng động thì đặt bút xuống, ngẩng đầu lên. <br />
-                                    Hạ Khâm mới nhận ra - thầy giáo này thật sự trẻ đến mức có phần quá đáng, còn khá điển trai nữa.<br />
-                                    Tóc không ngắn không dài, vừa đủ để lộ ra vầng trán sáng bóng. Đôi mắt phượng cũng rất đặc trưng, đuôi mắt hơi xếch xuống, nhưng khí chất trông không giống một giáo viên dạy học, mà lại có chút phong trần lêu lổng. <br />
-                                    “À.” Người đó nói: “Chào cậu, cậu là…?” <br />
-                                    Giọng nói cũng khá hay, không phải kiểu cố tình làm giọng trầm, mà trong trẻo và sáng rõ như viên đá lạnh rơi vào cốc thủy tinh, còn mang chút từ tính. <br />
-                                    “Em là học sinh đến báo danh hôm nay.” Hạ Khâm lễ phép gọi: “Thầy.” <br />
-                                    “…?” Thầy giáo trẻ chỉ vào mình, có chút ngạc nhiên: “Cậu gọi tôi là thầy à.” <br />
-                                    “?” <br />
-                                    Hạ Khâm hơi do dự. <br />
-                                    “À, đúng rồi.” Thầy giáo trẻ đứng dậy, cao 1m87, tạo cảm giác áp lực, đau lòng nói: “Không sao, tôi chỉ quá cảm động thôi! Hiểu chuyện còn lịch sự như cậu đây không nhiều đâu, bây giờ không có học sinh nào chịu gọi tôi là thầy cả.” <br />
-                                    Thầy giáo trẻ vừa nói vừa đi tới, rất thân thiện hỏi: “Này, bạn học, em cần giúp gì không? Thầy rất thích giúp đỡ mọi người.” <br />
-                                    Hạ Khâm nhìn thầy giáo trẻ nhiệt tình, cảm thấy có chút kỳ lạ. <br />
-                                    Cậu đã nghe nói về sự hiếu khách của người dân Tây Thành, không lẽ thầy giáo ở Tây Thành cũng nhiệt tình và ham học như vậy sao?<br />
-                                    “Sao không nói gì, có chuyện buồn à?” Thầy giáo trẻ nói với giọng điệu nghiêm túc, nhưng lời nói lại rất châm chọc: “Nếu có tâm sự thì đừng giấu, nói ra thầy cũng sẽ thấy vui.”<br />
-                                    “……”<br />
-                                    Hạ Khâm càng không muốn nói chuyện nữa.<br />
-                                    “À đúng rồi, cậu không phải vừa nói là cậu đến báo danh sao? Học lớp nào?”<br />
-                                    “Lớp 11-7.”<br />
-                                    “Trùng hợp ghê, đây không phải là lớp đó sao.” Giáo viên trẻ khoác vai cậu, giống như một cặp bạn bè vừa mới quen đã thân thiết.<br />
-                                    Hạ Khâm lạnh lùng tránh ra.<br />
-                                    Nhưng vị giáo viên này không hề có chút cảm giác bị ghét bỏ, vẫn tiếp tục nói không ngừng: “Tôi cũng dạy lớp 11-7.”<br />
-                                    “Thầy dạy ở lớp 11-7?” Hạ Khâm lập tức cảm thấy tuyệt vọng, chân thành hy vọng thầy giáo ngốc này dạy môn thể dục, để không làm cản trở việc cậu thi vào Thanh Hoa hay Bắc Đại.<br />
-                                    “Có vấn đề gì không? Nếu có vấn đề, sau này trong lớp có thể hỏi thầy.”<br />
-                                    ……<br />
-                                    Hiện tại, Hạ Khâm chỉ có một suy nghĩ duy nhất là làm sao để chuyển trường ngay lập tức.<br />
-                                    May mắn thay, sự xuất hiện của Chủ nhiệm Hà đã chặn đứng suy nghĩ vừa mới nảy mầm của Hạ Khâm.<br />
-                                    Cùng với Chủ nhiệm Hà, còn có giọng nói đặc trưng lớn của ông ấy: “Tạ Tinh Lan! Thầy đã bảo em ở Phòng Chính trị Giáo dục chép sách, sao em lại đứng dậy làm gì! Thầy thấy em không muốn lấy tín chỉ học kỳ này nữa phải không!”<br />
-                                    Tạ Tinh Lan khôi phục tư thế đứng nghiêm trong một giây, giọng nói lười biếng nói: “Báo cáo, thầy Hà, em đang làm quen với bạn mới ạ.”<br />
-                                    “Còn làm quen bạn mới nữa, em quen được đến đâu rồi?” Chủ nhiệm Hà cười lạnh một tiếng.<br />
-                                    Nụ cười lạnh này không có nghĩa là thầy ghét học sinh này, ngược lại, đó là sự thân thiết và tự nhiên vì rất thích học sinh này.<br />
-                                    “Nói thật, em cảm thấy mối quan hệ của chúng em đã bắt đầu có chút mập mờ. Đúng không, bạn mới?” Tạ Tinh Lan nhìn về phía Hạ Khâm.<br />
-                                    Hạ Khâm: … Mập mờ ông nội cậu.<br />
-                                    Ngày đầu tiên nhận lớp, giết người là phạm pháp. Bình tĩnh, bình tĩnh.<br />
-                                    Nhưng liệu người chưa thành niên có được giảm án không?<br />
-                                    “Mập mờ cái gì, đừng có mà bắt nạt bạn học, đi đi đi.” Chủ nhiệm Hà đã quen với bộ dạng lề mề của Tạ Tinh Lan.<br />
-                                    “Em chính là học sinh mới đúng không, đi theo thầy.” Chủ nhiệm Hà nói với Hạ Khâm: “Thầy sẽ dẫn em đến lớp 11-7.”<br />
-                                    Hạ Khâm mặt không biểu cảm kéo hành lý theo sau, vừa đi đến cửa, lại bị người khác khoác vai.<br />
-                                    “Bạn học.” Kẻ vừa rồi mặt dày mày dạn giả vờ làm thầy không hề có chút xấu hổ, với vẻ mặt như rất chân thành mở miệng: “Xin lỗi, tôi thật sự không cố ý.”<br />
-                                    Vâng vâng vâng, cậu cố ý không cẩn thận.<br />
-                                    “Như người ta nói, hiểu lầm là khởi đầu của một mối duyên đẹp, tôi cảm thấy cậu khá hợp mắt tôi, làm bạn với nhau nhé?”<br />
-                                    Tạ Tinh Lan đưa tay muốn bắt tay hòa giải, cười tươi lộ ra tám chiếc răng trắng.<br />
-                                    “Để tôi giới thiệu lại, tôi họ Tạ, Tạ Tinh Lan, Tinh trong Tạ Tinh Lan, Lan trong Tạ Tinh Lan.”<br />
-                                    Hạ Khâm nhìn cậu ta, rồi nhìn vào bàn tay đang đặt trên vai mình, nắm chặt cổ tay cậu ta kéo xuống, lịch sự nói: “Tôi họ Hạ, sau đây tôi có một câu hơi thô muốn nói với cậu.”<br />
-                                    “Tên tôi chỉ có một chữ Khâm, Khâm trong cấm cậu xuất hiện trong tầm mắt của tôi*.”<br />
-                                    * Khâm và cấm đồng âm với nhau (jìn)<br />
-                                    Tên đẹp trai điên rồ này nghe xong, không những không đi, mà còn không nhịn được vỗ tay: “Một câu chơi chữ hay, tôi thua.”<br />
-                                    Hạ Khâm không thể chịu nổi: “Lượn.”</div>
+                                <div class="content-text">
+                                    <?php echo $chapter['chapter_content']; ?>
+                                </div>
                             </div>
                             <script type="text/javascript">
                                 function confirmUnlockChapter(chapterId, chuongGold) {
@@ -484,25 +441,89 @@ Mẹ kiếp, vợ tôi ngầu thật." />
                                 }
                             </script>
                             <div class="chapter-info">
-                                <div class="prev-chapter"></div>
-                                <div class="next-chapter"><a href='indexc1ab.html?quanly=doc&amp;id_truyen=108&amp;id_chuong=11318'>Sau <i class='fas fa-arrow-right'></i></a></div>
+                                <div class="prev-chapter">
+                                    <?php
+
+                                    $currentChapterId = intval($_GET['chapter_id']);
+                                    // Tìm vị trí của chương hiện tại trong mảng
+                                    $currentChapterIndex = array_search($currentChapterId, array_column($chapters, 'chapter_id'));
+
+                                    if ($currentChapterIndex !== false && $currentChapterIndex != 0) {
+                                    ?>
+                                        <a href='story_detail.php?manga_id=<?php echo $_GET['manga_id']; ?>&chapter_id=<?php echo $chapters[$currentChapterIndex - 1]['chapter_id'] ?>'>
+                                            Trước
+                                            <i class='fas fa-arrow-right'></i>
+                                        </a>
+                                    <?php
+                                    }
+                                    ?>
+                                </div>
+                                <div class="next-chapter">
+                                    <?php
+
+                                    $currentChapterId = intval($_GET['chapter_id']);
+                                    // Tìm vị trí của chương hiện tại trong mảng
+                                    $currentChapterIndex = array_search($currentChapterId, array_column($chapters, 'chapter_id'));
+
+                                    if ($currentChapterIndex !== false && $currentChapterIndex < count($chapters) - 1) {
+                                    ?>
+                                        <a href='story_detail.php?manga_id=<?php echo $_GET['manga_id']; ?>&chapter_id=<?php echo $chapters[$currentChapterIndex + 1]['chapter_id'] ?>'>
+                                            Sau
+                                            <i class='fas fa-arrow-right'></i>
+                                        </a>
+                                    <?php
+                                    }
+                                    ?>
+                                </div>
                             </div>
                             <div class="chapter-navigation">
                                 <div class="comments-section">
                                     <h3>Bình Luận</h3>
-                                    <form id="comment-form" method="post">
+                                    <form id="comment-form" method="get" action="submit_comment.php">
                                         <label for="comment">Nhập bình luận của bạn:</label>
                                         <textarea name="comment" id="comment" rows="4" required></textarea>
-                                        <input type="hidden" name="id_truyen" id="id_truyen" value="<?php echo $id_truyen; ?>">
-                                        <input type="hidden" name="id_chuong" id="id_chuong" value="<?php echo $id_chuongs; ?>">
+                                        <input type="hidden" name="manga_id" id="manga_id" value="<?php echo $manga_id; ?>">
+                                        <input type="hidden" name="chapter_id" id="chapter_id" value="<?php echo $chapter_id; ?>">
 
-                                        <input type="button" id="submit-comment" value="Đăng Bình Luận">
+                                        <input type="submit" id="submit-comment" value="Đăng Bình Luận">
                                     </form>
                                     <p id="login-prompt" style="display: none;">Vui lòng <a href="indexe536.html?quanly=dangnhap">đăng nhập</a> để bình luận.</p>
                                     <!-- Bên dưới div comment-list -->
 
                                     <h3 class="theh">0 Thảo luận </h3>
-                                    <div id="comment-list"></div>
+                                    <div id="comment-list">
+                                        <!-- select all comments includes manga_id and chapter_id -->
+                                        <?php
+                                        // Assuming $manga_id and $chapter['chapter_id'] are properly set before this block
+                                        if (isset($manga_id) && isset($chapter['chapter_id'])) {
+
+                                            // Inner Join accounts and manga_comment
+                                            $query = "SELECT * FROM accounts INNER JOIN manga_comment ON accounts.acc_id = manga_comment.acc_id WHERE manga_id = ? AND chapter_id = ?";
+                                            $stmt = $conn->prepare($query);
+                                            $stmt->bind_param('ii', $manga_id, $chapter['chapter_id']);
+                                            $stmt->execute();
+                                            $result = $stmt->get_result();
+                                            $comments = []; // Initialize comments variable
+                                            while ($row = $result->fetch_assoc()) {
+                                                $comments[] = $row;
+                                            }
+
+                                            foreach ($comments as $comment) {
+                                                echo '<div class="comment-item">
+            <div class="comment-avatar">
+                <img src="assets/image/avatar.jpg" alt="Avatar" width="40" height="40">
+            </div>
+            <div class="comment-content">
+                <h4>' . htmlspecialchars($comment['fullname'], ENT_QUOTES, 'UTF-8') . '</h4>
+                <p>' . htmlspecialchars($comment['comment'], ENT_QUOTES, 'UTF-8') . '</p>
+            </div>
+          </div>';
+                                            }
+                                        }
+                                        ?>
+
+
+                                    </div>
                                     <button id="load-more-comments" type="button">Xem thêm</button>
                                     <div id="pagination"></div>
                                 </div>
@@ -547,84 +568,84 @@ Mẹ kiếp, vợ tôi ngầu thật." />
                                     loadComments(idTruyen, idChuong, offset);
                                 });
 
-                                function loadComments(idTruyen, idChuong, currentOffset) {
-                                    var commentListContainer = document.getElementById('comment-list');
-                                    if (currentOffset === 0) {
-                                        commentListContainer.innerHTML = ''; // Clear comments if loading from start
-                                    }
+                                // function loadComments(idTruyen, idChuong, currentOffset) {
+                                //     var commentListContainer = document.getElementById('comment-list');
+                                //     if (currentOffset === 0) {
+                                //         commentListContainer.innerHTML = ''; // Clear comments if loading from start
+                                //     }
 
-                                    var xhr = new XMLHttpRequest();
-                                    xhr.open('POST.html', 'pages/comment.html', true);
-                                    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-                                    xhr.onreadystatechange = function() {
-                                        if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
-                                            var comments = JSON.parse(xhr.responseText);
-                                            comments.forEach(function(comment) {
-                                                var li = document.createElement('li');
-                                                li.className = 'li-acfs';
+                                //     var xhr = new XMLHttpRequest();
+                                //     xhr.open('POST.html', 'pages/comment.html', true);
+                                //     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+                                //     xhr.onreadystatechange = function() {
+                                //         if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+                                //             var comments = JSON.parse(xhr.responseText);
+                                //             comments.forEach(function(comment) {
+                                //                 var li = document.createElement('li');
+                                //                 li.className = 'li-acfs';
 
-                                                var divAvatar = document.createElement('div');
-                                                divAvatar.className = 'comment-avatar';
-                                                var img = document.createElement('img');
+                                //                 var divAvatar = document.createElement('div');
+                                //                 divAvatar.className = 'comment-avatar';
+                                //                 var img = document.createElement('img');
 
-                                                // Kiểm tra xem comment.user_avatar có phải là một URL hay không
-                                                if (/^(http|https):\/\/.+$/.test(comment.user_avatar)) {
-                                                    // Nếu là URL, sử dụng đường dẫn trực tiếp
-                                                    img.src = comment.user_avatar;
-                                                } else {
-                                                    // Nếu không phải là URL, sử dụng đường dẫn tương đối
-                                                    img.src = './assets/image/' + comment.user_avatar;
-                                                }
+                                //                 // Kiểm tra xem comment.user_avatar có phải là một URL hay không
+                                //                 if (/^(http|https):\/\/.+$/.test(comment.user_avatar)) {
+                                //                     // Nếu là URL, sử dụng đường dẫn trực tiếp
+                                //                     img.src = comment.user_avatar;
+                                //                 } else {
+                                //                     // Nếu không phải là URL, sử dụng đường dẫn tương đối
+                                //                     img.src = './assets/image/' + comment.user_avatar;
+                                //                 }
 
-                                                img.alt = 'Avatar';
-                                                img.className = 'rounded-circle';
-                                                img.width = '30';
-                                                divAvatar.appendChild(img);
+                                //                 img.alt = 'Avatar';
+                                //                 img.className = 'rounded-circle';
+                                //                 img.width = '30';
+                                //                 divAvatar.appendChild(img);
 
-                                                var divContent = document.createElement('div');
-                                                divContent.className = 'comment-content';
+                                //                 var divContent = document.createElement('div');
+                                //                 divContent.className = 'comment-content';
 
-                                                var pUser = document.createElement('p');
-                                                pUser.className = 'comment-info';
-                                                pUser.textContent = comment.user_tenuser;
+                                //                 var pUser = document.createElement('p');
+                                //                 pUser.className = 'comment-info';
+                                //                 pUser.textContent = comment.user_tenuser;
 
-                                                // Tạo một phần tử <span> mới để hiển thị thông tin chương
-                                                var spanChapter = document.createElement('span');
-                                                spanChapter.className = 'comment-chapter';
-                                                spanChapter.textContent = ' Chương: ' + comment.id_chuong; // Hiển thị thông tin chương
-                                                spanChapter.style.marginLeft = '5px'; // Tạo khoảng cách giữa tên người dùng và thông tin chương
+                                //                 // Tạo một phần tử <span> mới để hiển thị thông tin chương
+                                //                 var spanChapter = document.createElement('span');
+                                //                 spanChapter.className = 'comment-chapter';
+                                //                 spanChapter.textContent = ' Chương: ' + comment.id_chuong; // Hiển thị thông tin chương
+                                //                 spanChapter.style.marginLeft = '5px'; // Tạo khoảng cách giữa tên người dùng và thông tin chương
 
-                                                // Thêm thông tin chương sau tên người dùng
-                                                pUser.appendChild(spanChapter);
+                                //                 // Thêm thông tin chương sau tên người dùng
+                                //                 pUser.appendChild(spanChapter);
 
-                                                var pTime = document.createElement('p');
-                                                pTime.className = 'comment-time';
-                                                pTime.textContent = comment.binhluan_ngay;
+                                //                 var pTime = document.createElement('p');
+                                //                 pTime.className = 'comment-time';
+                                //                 pTime.textContent = comment.binhluan_ngay;
 
-                                                var pContent = document.createElement('p');
-                                                pContent.className = 'chapter-content';
-                                                pContent.textContent = comment.binhluan_noidung;
+                                //                 var pContent = document.createElement('p');
+                                //                 pContent.className = 'chapter-content';
+                                //                 pContent.textContent = comment.binhluan_noidung;
 
-                                                divContent.appendChild(pUser);
-                                                divContent.appendChild(pTime);
-                                                divContent.appendChild(pContent);
+                                //                 divContent.appendChild(pUser);
+                                //                 divContent.appendChild(pTime);
+                                //                 divContent.appendChild(pContent);
 
-                                                li.appendChild(divAvatar);
-                                                li.appendChild(divContent);
+                                //                 li.appendChild(divAvatar);
+                                //                 li.appendChild(divContent);
 
-                                                commentListContainer.appendChild(li);
-                                            });
+                                //                 commentListContainer.appendChild(li);
+                                //             });
 
-                                            if (comments.length === limit) {
-                                                offset += limit; // Only update offset if full set of comments was loaded
-                                            }
-                                        } else if (xhr.readyState === XMLHttpRequest.DONE) {
-                                            alert('Đã có lỗi xảy ra khi tải danh sách bình luận.');
-                                        }
-                                    };
-                                    // Thêm id_chuong vào yêu cầu gửi đi
-                                    xhr.send('id_truyen=' + idTruyen + '&id_chuong=' + idChuong + '&offset=' + currentOffset + '&limit=' + limit);
-                                }
+                                //             if (comments.length === limit) {
+                                //                 offset += limit; // Only update offset if full set of comments was loaded
+                                //             }
+                                //         } else if (xhr.readyState === XMLHttpRequest.DONE) {
+                                //             alert('Đã có lỗi xảy ra khi tải danh sách bình luận.');
+                                //         }
+                                //     };
+                                //     // Thêm id_chuong vào yêu cầu gửi đi
+                                //     xhr.send('id_truyen=' + idTruyen + '&id_chuong=' + idChuong + '&offset=' + currentOffset + '&limit=' + limit);
+                                // }
 
                                 // Tải danh sách bình luận ban đầu khi trang được tải
                                 loadComments(idTruyen, idChuong, offset);

@@ -1,5 +1,5 @@
 <?php
-// session_start(); // Bắt đầu phiên làm việc
+session_start(); // Bắt đầu phiên làm việc
 include('config/db_connection.php');
 
 // Truy vấn lấy các thể loại và danh sách thịnh hành
@@ -108,10 +108,20 @@ if ($result_trending && $result_trending->num_rows > 0) {
                     <i class="fa-solid fa-magnifying-glass"></i>
                 </button>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" href="login.php">Đăng Nhập</a>
-            </li>
 
+            <!-- Kiểm tra trạng thái đăng nhập -->
+            <?php if (isset($_SESSION['fullname'])): ?>
+                <li class="nav-item">
+                    <span class="nav-link">Xin chào, <?= htmlspecialchars($_SESSION['fullname']); ?></span>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="config/logout.php">Đăng Xuất</a>
+                </li>
+            <?php else: ?>
+                <li class="nav-item">
+                    <a class="nav-link" href="login.php">Đăng Nhập</a>
+                </li>
+            <?php endif; ?>
         </ul>
     </nav>
 </header>
