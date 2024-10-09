@@ -27,8 +27,14 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
         $_SESSION['role_id'] = $user['role_id'];
 
         // Điều hướng người dùng đến trang chính sau khi đăng nhập thành công
-        header("Location: ../index.php");
+        if($_SESSION['role_id'] == 1){
+            header("Location: ../admin/index.php");
         exit();
+        }
+        else{
+            header("Location: ../index.php");
+        exit();
+        }
     } else {
         // Sai tên đăng nhập hoặc mật khẩu
         $_SESSION['error'] = "Sai tên đăng nhập hoặc mật khẩu.";
