@@ -5,7 +5,7 @@
       Liên Hệ
      </h3>
      <p>
-      Email:  nthanhcong375@gmail.com
+      Email:  nguyenthilan88509@gmail.com
      </p>
     </div>
     <div class="footer-section">
@@ -37,10 +37,7 @@
    </div>
    <div class="copyright">
     <p>
-     ©  Trang Chủ. All rights reserved.
-    </p>
-    <p>
-     Đây là trang được thiết kế lại nhằm mục đích demo website.
+    © Design & Support by <a href="https://vvtek.net" style="color: white">VVTEK</a>
     </p>
    </div>
   </footer>

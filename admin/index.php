@@ -190,18 +190,8 @@ while ($row = $result_manga_views->fetch_assoc()) {
             <span>&#9660;</span>
         </div>
         <ul id="aff-menu">
-            <li><a href="affiliate/index.php">Danh Sách Link Aff</a></li>
-            <li><a href="affiliate/create.php">Tạo Link Aff</a></li>
-        </ul>
-
-        <!-- Completed Section -->
-        <div class="toggle-btn" onclick="toggleMenu('completed-menu')">
-            <span>Truyện hoàn thành</span>
-            <span>&#9660;</span>
-        </div>
-        <ul id="completed-menu">
-            <li><a href="completed/index.php">Danh sách truyện</a></li>
-            <li><a href="completed/create.php">Thêm mới</a></li>
+            <li><a href="index.php">Danh Sách Link Aff</a></li>
+            <li><a href="create.php">Tạo Link Aff</a></li>
         </ul>
 
         <a href="../config/logout.php">Đăng Xuất</a>

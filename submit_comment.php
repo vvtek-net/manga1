@@ -39,7 +39,7 @@ if (isset($_GET['comment'], $_GET['manga_id'])) {
         echo '<script type="text/javascript">
             alert("Bình luận thành công!");
           </script>';
-        if ($chapter_id === '') {
+        if ($chapter_id === null) {
             header("Location: story.php?manga_id=$manga_id");
         } else {
             header("Location: story_detail.php?manga_id=$manga_id&chapter_id=$chapter_id");

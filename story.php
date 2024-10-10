@@ -414,7 +414,7 @@ if ($manga_result->num_rows > 0) {
                             <h3 class="h3-acd">Giới Thiệu Truyện</h3>
                             <p class="acd">
                                 <?php
-                                echo $result['manga_content'];
+                                echo $result['description'];
                                 ?>
                             </p>
                         </div>
@@ -509,7 +509,7 @@ if ($manga_result->num_rows > 0) {
 
                             <script>
                                 document.addEventListener('DOMContentLoaded', function() {
-                                    var manga_id = 3; // Thay giá trị này bằng ID truyện của bạn
+                                    var manga_id = <?php echo $_GET['manga_id']; ?>; // Thay giá trị này bằng ID truyện của bạn
                                     var offset = 0; // Vị trí bắt đầu của bình luận
                                     var limit = 5; // Số lượng bình luận mỗi lần tải
 

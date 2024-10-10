@@ -147,16 +147,6 @@ $result = $conn->query($query);
             <li><a href="../affiliate/create.php">Create affiliate</a></li>
         </ul>
 
-        <!-- Completed Section -->
-        <div class="toggle-btn" onclick="toggleMenu('completed-menu')">
-            <span>Truyện hoàn thành</span>
-            <span>&#9660;</span>
-        </div>
-        <ul id="completed-menu">
-            <li><a href="../completed/index.php">Danh sách truyện</a></li>
-            <li><a href="../completed/create.php">Thêm mới</a></li>
-        </ul>
-
         <a href="../logout.php">Đăng Xuất</a>
     </div>
     <div class="content">

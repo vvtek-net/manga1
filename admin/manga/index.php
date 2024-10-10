@@ -141,8 +141,8 @@ $result = $conn->query($query);
             <span>&#9660;</span>
         </div>
         <ul id="aff-menu">
-            <li><a href="../affiliate/index.php">View affiliate</a></li>
-            <li><a href="../affiliate/create.php">Create affiliate</a></li>
+            <li><a href="index.php">Danh Sách Link Aff</a></li>
+            <li><a href="create.php">Tạo Link Aff</a></li>
         </ul>
 
         <a href="../logout.php">Đăng Xuất</a>
@@ -150,6 +150,8 @@ $result = $conn->query($query);
     <div class="content">
         <h1>Danh Sách Truyện</h1>
         <a class="btn btn-success" href="create.php">Thêm Truyện Mới</a>
+        <a class="btn btn-primary" href="../chapter/index.php">Danh Sách Chương</a>
+        <a class="btn btn-secondary"href="../completed/index.php">Truyện Đã Hoàn Thành</a>
 
         <table class="table" border="1">
             <thead>

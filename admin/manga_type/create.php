@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Manga Type</title>
+    <title>Tạo Mới Thể Loại Truyện</title>
     <link rel="stylesheet" href="../../assets/css/styles.css">
     <style>
         body {
@@ -110,11 +110,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <body>
 
-    <h1>Create Manga Type</h1>
+    <h1>Tạo mới thể loại truyện</h1>
     <form action="" method="post">
-        <label for="type_name">Type Name:</label>
+        <label for="type_name">Tên thể loại:</label>
         <input type="text" id="type_name" name="type_name" required>
-        <input type="submit" value="Create">
+        <input type="submit" value="Thêm Mới">
     </form>
 
 </body>

@@ -1,7 +1,5 @@
 <?php
-if (session_status() == PHP_SESSION_NONE) {
-    session_start();
-}
+
 
 include('config/db_connection.php');
 
@@ -48,7 +46,7 @@ try {
             foreach ($mangas as $manga) {
             }
         } else {
-            echo "<p>Không tìm thấy dữ liệu phù hợp.</p>";
+            
         }
     } else {
         throw new Exception("Lỗi khi chuẩn bị truy vấn.");

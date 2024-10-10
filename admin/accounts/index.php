@@ -140,8 +140,8 @@ $result = $conn->query($query);
             <span>&#9660;</span>
         </div>
         <ul id="aff-menu">
-            <li><a href="../affiliate/index.php">View affiliate</a></li>
-            <li><a href="../affiliate/create.php">Create affiliate</a></li>
+            <li><a href="index.php">Danh Sách Link Aff</a></li>
+            <li><a href="create.php">Tạo Link Aff</a></li>
         </ul>
         <a href="../logout.php">Đăng Xuất</a>
     </div>

@@ -25,7 +25,8 @@ if (isset($_GET['manga_id'])) {
     while ($row = $result->fetch_assoc()) {
         $comments[] = $row;
     }
-
+    // var_dump($comments);
+    // exit();
     // Trả về dữ liệu dưới dạng JSON
     echo json_encode($comments);
 } else {

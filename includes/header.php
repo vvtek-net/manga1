@@ -22,7 +22,7 @@ if ($result_type && $result_type->num_rows > 0) {
         $types[] = $row;
     }
 } else {
-    echo "Không tìm thấy dữ liệu cho bảng manga_type hoặc lỗi truy vấn: " . $conn->error;
+    // echo "Không tìm thấy dữ liệu cho bảng manga_type hoặc lỗi truy vấn: " . $conn->error;
 }
 
 if ($result_trending && $result_trending->num_rows > 0) {
@@ -30,7 +30,7 @@ if ($result_trending && $result_trending->num_rows > 0) {
         $trendings[] = $row;
     }
 } else {
-    echo "Không tìm thấy dữ liệu cho bảng trending hoặc lỗi truy vấn: " . $conn->error;
+    // echo "Không tìm thấy dữ liệu cho bảng trending hoặc lỗi truy vấn: " . $conn->error;
 }
 ?>
 
@@ -116,7 +116,7 @@ if ($result_trending && $result_trending->num_rows > 0) {
                     if ($_SESSION['role_id'] == 1) {
                         echo '<span class="nav-link"><a href="admin/index.php">Xin chào ' . $_SESSION['fullname'] . '</a></span>';
                     } else {
-                        echo '<span class="nav-link">Xin chào, = htmlspecialchars(' . $_SESSION['fullname'] . ');</span>';
+                        echo '<span class="nav-link">Xin chào ' . $_SESSION['fullname'] . '</span>';
                     }
                     ?>
                 </li>
