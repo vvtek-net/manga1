@@ -2,11 +2,13 @@
 include '../config/db_connection.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $trending_name = $_POST['trending_name'];
+    $aff_name = $_POST['aff_name'];
+    $product = $_POST['product'];
+    $manga_id = $_POST['manga_id'];
 
-    $query = "INSERT INTO trending (trending_name) VALUES (?)";
+    $query = "INSERT INTO manga_affiliate (aff_link, product_name, manga_id, update_at) VALUES (?, ?, ?, NOW())";
     $stmt = $conn->prepare($query);
-    $stmt->bind_param('s', $trending_name);
+    $stmt->bind_param('ssi', $aff_name, $product, $manga_id);
     $stmt->execute();
 
     header('Location: index.php');
@@ -105,16 +107,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .form-field {
             margin-bottom: 15px;
         }
+
+        select#manga_id {
+            padding: 10px;
+            margin-top: 5px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            width: 100%;
+            box-sizing: border-box;
+        }
     </style>
 </head>
 
 <body>
 
-    <h1>Create Trending</h1>
+    <h1>Tạo link affiliate</h1>
     <form action="" method="post">
-        <label for="trending_name">Trending Name:</label>
-        <input type="text" id="trending_name" name="trending_name" required>
-        <input type="submit" value="Create">
+        <label for="manga_id">Tên truyện:</label>
+        <select name="manga_id" id="manga_id">
+            <option value="">-- Chọn truyện --</option>
+            <?php
+            $query = "SELECT * FROM manga";
+            $result = $conn->query($query);
+            while ($row = $result->fetch_assoc()) {
+                echo '<option value="' . $row['manga_id'] . '">' . $row['manga_name'] . '</option>';
+            }
+            ?>
+        </select>
+
+        <label for="aff_name">Link Affiliate:</label>
+        <input type="text" id="aff_name" name="aff_name" required>
+
+        <label for="product">Tên sản phẩm:</label>
+        <input type="text" id="product" name="product" required>
+
+        <input type="submit" value="Tạo">
     </form>
 
 </body>

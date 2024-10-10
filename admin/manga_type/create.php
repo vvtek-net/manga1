@@ -111,7 +111,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
 
     <h1>Create Manga Type</h1>
-    <form action="create.php" method="post">
+    <form action="" method="post">
         <label for="type_name">Type Name:</label>
         <input type="text" id="type_name" name="type_name" required>
         <input type="submit" value="Create">

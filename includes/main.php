@@ -6,6 +6,7 @@ $query = "SELECT * FROM manga ORDER BY update_at DESC LIMIT 10";
 $stmt = $conn->prepare($query);
 $stmt->execute();
 $manga_result = $stmt->get_result();
+
 ?>
 
 <main>
@@ -41,7 +42,7 @@ $manga_result = $stmt->get_result();
                         <div class="column-80">
                             <div class="fsdfs433">
                                 <h3 class="thehh">
-                                    Truyện Mới Cập Nhật
+                                    TRUYỆN MỚI CẬP NHẬT
                                 </h3>
                                 <a href="filter.php">
                                     <i class="fa-solid fa-angles-right">
@@ -106,9 +107,9 @@ $manga_result = $stmt->get_result();
                             $chapter_result = $stmt->get_result();
                             ?>
                             <div class="new-stories-abc">
-                                <h3 class="theh">Chương Mới Cập Nhật</h3>
+                                <h3 class="theh">CHƯƠNG MỚI CẬP NHẬT</h3>
                                 <div class="story-list-abc">
-                                    <table class="chapter-table">
+                                    <table class="chapter-table" style="width: 100%;">
                                         <tbody>
                                             <?php while ($chapter_row = $chapter_result->fetch_assoc()) { ?>
                                                 <tr class="chapter-row">
@@ -181,7 +182,7 @@ $manga_result = $stmt->get_result();
                             $rank = 1;
 
                             // Truy vấn kết hợp hai bảng manga và manga_nomination để lấy 10 truyện có số lượng đề cử nhiều nhất
-                            $query = "SELECT manga.manga_id, manga.manga_name, manga.author, COUNT(manga_nomination.nomination_id) as nomination_count
+                            $query = "SELECT manga.manga_id, manga.manga_name, manga.author, manga.imgurl, manga.view_number, COUNT(manga_nomination.nomination_id) as nomination_count
                                         FROM manga 
                                         JOIN manga_nomination ON manga.manga_id = manga_nomination.manga_id
                                         GROUP BY manga.manga_id
@@ -195,14 +196,30 @@ $manga_result = $stmt->get_result();
                                 <h3 class="theh">TOP ĐỀ CỬ</h3>
                                 <div class="weekly-list">
                                     <?php while ($nomination_row = $nomination_result->fetch_assoc()) { ?>
-                                        <div class="weekly-item">
-                                            <span class="rank-number"><?php echo $rank; ?></span>
-                                            <a class="tieudetruyen" href="story.php?manga_id=<?php echo $nomination_row['manga_id']; ?>">
-                                                <?php echo $nomination_row['manga_name']; ?>
-                                            </a>
-                                            <div class="tenuser">
+                                        <div class="weekly-item" style="display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px dashed #ddd;">
+
+                                            <!-- Số thứ tự và ảnh ở bên trái -->
+                                            <div style="display: flex; align-items: center; gap: 10px;">
+                                                <span class="rank-number" style="font-weight: bold; font-size: 16px;"><?php echo $rank; ?></span>
+                                                <div class="image-container" style="display: flex; align-items: center;">
+                                                    <img alt="<?php echo $nomination_row['manga_name']; ?>" src="<?php echo $nomination_row['imgurl']; ?>" style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px;" />
+                                                    <div class="read-count" style="font-size: 12px; text-align: center;">
+                                                        <i class="fa-solid fa-eye"></i> <?php echo $nomination_row['view_number']; ?>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Tên truyện ở giữa và được căn giữa theo chiều ngang -->
+                                            <div style="flex-grow: 1; display: flex; justify-content: center;">
+                                                <a class="tieudetruyen" href="story.php?manga_id=<?php echo $nomination_row['manga_id']; ?>" style="text-decoration: none; color: inherit;">
+                                                    <p style="margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"><?php echo $nomination_row['manga_name']; ?></p>
+                                                </a>
+                                            </div>
+
+                                            <!-- Tên tác giả ở bên phải -->
+                                            <div class="tenuser" style="min-width: 80px; text-align: right; font-size: 14px;">
                                                 <i class="fas fa-user-edit"></i>
-                                                <?php echo $nomination_row['author']; ?>
+                                                <span style="margin-left: 5px;"><?php echo $nomination_row['author']; ?></span>
                                             </div>
                                         </div>
                                     <?php $rank++;
@@ -220,17 +237,32 @@ $manga_result = $stmt->get_result();
                             $view_result = $stmt->get_result();
                             ?>
                             <div class="column">
-                                <h3 class="theh">TOP LƯỢT XEM</h3>
+                                <h3 class="theh">TOP LƯỢT ĐỌC</h3>
                                 <div class="weekly-list">
                                     <?php while ($view_row = $view_result->fetch_assoc()) { ?>
-                                        <div class="weekly-item">
-                                            <span class="rank-number"><?php echo $rank; ?></span>
-                                            <a class="tieudetruyen" href="story.php?manga_id=<?php echo $view_row['manga_id']; ?>">
-                                                <?php echo $view_row['manga_name']; ?>
-                                            </a>
-                                            <p class="luotdoc">
-                                                <i class="fa-solid fa-eye"></i> <?php echo $view_row['view_number']; ?>
-                                            </p>
+                                        <div class="weekly-item" style="display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px dashed #ddd;">
+
+                                            <!-- Số thứ tự và ảnh ở bên trái -->
+                                            <div style="display: flex; align-items: center; gap: 10px;">
+                                                <span class="rank-number" style="font-weight: bold; font-size: 16px;"><?php echo $rank; ?></span>
+                                                <div class="image-container" style="display: flex; align-items: center;">
+                                                    <img alt="<?php echo $view_row['manga_name']; ?>" src="<?php echo $view_row['imgurl']; ?>" style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px;" />
+
+                                                </div>
+                                            </div>
+
+                                            <!-- Tên truyện ở giữa và được căn giữa theo chiều ngang -->
+                                            <div style="flex-grow: 1; display: flex; justify-content: center;">
+                                                <a class="tieudetruyen" href="story.php?manga_id=<?php echo $view_row['manga_id']; ?>" style="text-decoration: none; color: inherit;">
+                                                    <p style="margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"><?php echo $view_row['manga_name']; ?></p>
+                                                </a>
+                                            </div>
+
+                                            <!-- Tên tác giả ở bên phải -->
+                                            <div class="tenuser" style="min-width: 80px; text-align: right; font-size: 14px;">
+                                                <i class="fas fa-user-edit"></i>
+                                                <span style="margin-left: 5px;"><?php echo $view_row['view_number']; ?></span>
+                                            </div>
                                         </div>
                                     <?php $rank++;
                                     } ?>
@@ -247,24 +279,39 @@ $manga_result = $stmt->get_result();
                             ?>
                             <div class="column">
                                 <h3 class="theh">TRUYỆN HOÀN THÀNH</h3>
-                                <div class="completed-list">
+                                <div class="weekly-list">
                                     <?php while ($completed_row = $completed_result->fetch_assoc()) { ?>
-                                        <div class="completed-item">
-                                            <span class="rank-number"><?php echo $rank; ?></span>
-                                            <a href="story.php?manga_id=<?php echo $completed_row['manga_id']; ?>">
-                                                <div class="image-container">
+                                        <div class="weekly-item" style="display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px dashed #ddd;">
+
+                                            <!-- Số thứ tự và ảnh ở bên trái -->
+                                            <div style="display: flex; align-items: center; gap: 10px;">
+                                                <span class="rank-number" style="font-weight: bold; font-size: 16px;"><?php echo $rank; ?></span>
+                                                <div class="image-container" style="display: flex; align-items: center;">
                                                     <img alt="<?php echo $completed_row['manga_name']; ?>" src="<?php echo $completed_row['imgurl']; ?>" style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px;" />
-                                                    <div class="read-counts">
+                                                    <div class="read-count" style="font-size: 12px; text-align: center;">
                                                         <i class="fa-solid fa-eye"></i> <?php echo $completed_row['view_number']; ?>
                                                     </div>
                                                 </div>
-                                                <p class="tieudetruyena"><?php echo $completed_row['manga_name']; ?></p>
-                                            </a>
+                                            </div>
+
+                                            <!-- Tên truyện ở giữa và được căn giữa theo chiều ngang -->
+                                            <div style="flex-grow: 1; display: flex; justify-content: center;">
+                                                <a class="tieudetruyen" href="story.php?manga_id=<?php echo $completed_row['manga_id']; ?>" style="text-decoration: none; color: inherit;">
+                                                    <p style="margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"><?php echo $completed_row['manga_name']; ?></p>
+                                                </a>
+                                            </div>
+
+                                            <!-- Tên tác giả ở bên phải -->
+                                            <div class="tenuser" style="min-width: 80px; text-align: right; font-size: 14px;">
+                                                <i class="fas fa-user-edit"></i>
+                                                <span style="margin-left: 5px;"><?php echo $completed_row['author']; ?></span>
+                                            </div>
                                         </div>
                                     <?php $rank++;
                                     } ?>
                                 </div>
                             </div>
+
 
                         </div>
                     </div>

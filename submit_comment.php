@@ -39,7 +39,11 @@ if (isset($_GET['comment'], $_GET['manga_id'])) {
         echo '<script type="text/javascript">
             alert("Bình luận thành công!");
           </script>';
-        header("Location: story.php?manga_id=$manga_id");
+        if ($chapter_id === '') {
+            header("Location: story.php?manga_id=$manga_id");
+        } else {
+            header("Location: story_detail.php?manga_id=$manga_id&chapter_id=$chapter_id");
+        }
     } else {
         echo "error: " . $stmt->error;  // Phản hồi lỗi nếu có
     }

@@ -48,8 +48,6 @@ if ($manga_result->num_rows > 0) {
 
 </head>
 
-
-
 <body>
     <?php
     include('includes/header.php');
@@ -228,10 +226,34 @@ if ($manga_result->num_rows > 0) {
 
 
                             <div class="author-rating-container">
-                                <a href="index23cb.html?quanly=truyen&amp;search=Tam+Thi%C3%AAn+Phong+Tuy%E1%BA%BFt" class="acd">
+
+                                <!-- rating -->
+                                <?php
+                                $queryRate = "SELECT 
+                                                AVG(rate_character_personality) AS avg_personality, 
+                                                AVG(rate_plot_content) AS avg_plot, 
+                                                AVG(rate_world_layout) AS avg_world, 
+                                                AVG(rate_translation_quality) AS avg_translation,
+                                                COUNT(manga_id) AS rating
+                                            FROM manga_rate 
+                                            WHERE manga_id = ?";
+                                $stmt = $conn->prepare($queryRate);
+                                $stmt->bind_param('i', $manga_id);
+                                $stmt->execute();
+                                $resultTotal = $stmt->get_result();
+                                $total = 0;
+                                if ($resultTotal->num_rows > 0) {
+                                    $row = $resultTotal->fetch_assoc();
+                                    // Tính trung bình tổng các cột
+                                    $total = ($row['avg_personality'] + $row['avg_plot'] + $row['avg_world'] + $row['avg_translation']) / 4;
+                                }
+                                $stmt->close();
+                                ?>
+
+                                <a class="acd">
                                     <i class="fa-solid fa-user-pen"></i> <?php echo $result['author']; ?></a>
 
-                                <div class="star-container-123"><i class="fa-star fa-regular" style="color: #ccc;"></i><i class="fa-star fa-regular" style="color: #ccc;"></i><i class="fa-star fa-regular" style="color: #ccc;"></i><i class="fa-star fa-regular" style="color: #ccc;"></i><i class="fa-star fa-regular" style="color: #ccc;"></i><span id="tongdiem-value-123">0</span><span>/5 (0 đánh giá)</span></div>
+                                <div class="star-container-123"><i class="fa-star fa-regular" style="color: #ccc;"></i><i class="fa-star fa-regular" style="color: #ccc;"></i><i class="fa-star fa-regular" style="color: #ccc;"></i><i class="fa-star fa-regular" style="color: #ccc;"></i><i class="fa-star fa-regular" style="color: #ccc;"></i><span id="tongdiem-value-123"><?php echo round($total); ?></span><span>/5 (<?php echo $row['rating']; ?> đánh giá)</span></div>
                             </div>
 
 
@@ -284,6 +306,7 @@ if ($manga_result->num_rows > 0) {
                                         <h2>Đánh giá truyện</h2>
                                         <!-- Tính Cách Nhân Vật -->
                                         <input type="hidden" name="manga_id" value="<?php echo $manga_id; ?>" />
+
                                         <label for="tinhcach">Tính Cách Nhân Vật:</label>
                                         <input type="range" class="danhgia123" name="tinhcach" min="0" max="5" step="0.5" value="0">
                                         <span id="tinhcach-value">0</span><br>
@@ -353,8 +376,6 @@ if ($manga_result->num_rows > 0) {
                         <div class="fkdkfdk2">
                             <a href="index18f1.html?quanly=yeuthich&amp;id_truyen=108" class="hsdhdsh"><i class="fa-regular fa-heart"></i></a><br>
                             <a href="#" class="hsdhdsh"><i class="fa-regular fa-bookmark"></i></a>
-
-
                             </script>
                         </div>
                     </div>
@@ -370,14 +391,19 @@ if ($manga_result->num_rows > 0) {
                             </li>
                             <li class="nav-item-axc">
                                 <!-- Đếm số bình luận trong bảng manga_comment tương ứng với manga_id được GET từ url -->
+                                <?php
+                                $queryComment = "SELECT COUNT(*) AS total FROM manga_comment WHERE manga_id = $manga_id and chapter_id IS NULL";
+                                $resultComment = $conn->query($queryComment);
+                                $result_comment = $resultComment->fetch_assoc();
+                                ?>
                                 <a class="nav-link-axc" id="binh-luan-tab" href="#binh-luan" onclick="openTab('binh-luan')">
-                                    Bình Luận <span class="badge">0</span>
+                                    Bình Luận <span class="badge"><?php echo $result_comment['total']; ?></span>
                                 </a>
                             </li>
                             <li class="nav-item-axc">
                                 <!-- Đếm số đánh giá trong bảng manga_rate tương ứng với manga_id được GET từ url -->
                                 <a class="nav-link-axc" id="danh-gia-tab" href="#danh-gia" onclick="openTab('danh-gia')">
-                                    Đánh giá <span class="badge">0</span>
+                                    Đánh giá <span class="badge"><?php echo $row['rating']; ?></span>
                                 </a>
                             </li>
                         </ul>
@@ -466,14 +492,14 @@ if ($manga_result->num_rows > 0) {
                                 <textarea name="comment" id="comment" rows="4" required></textarea>
                                 <input type="hidden" name="manga_id" id="manga_id" value="<?php echo $manga_id; ?>">
                                 <input type="hidden" name="chapter_id" id="chapter_id" value="">
-                                <button type="submit" id="submit-comment">Đăng Bình Luận</button>
+                                <button style="padding: 15px; background-color: #5db85c; color: #fff; cursor: pointer; border: none; border-radius: 999px; font-weight: 700;" type="submit" id="submit-comment">Đăng Bình Luận</button>
                             </form>
 
 
                             <!-- <p id="login-prompt" style="display: none;">Vui lòng <a href="indexe536.html?quanly=dangnhap">đăng nhập</a> để bình luận.</p> -->
                             <!-- Bên dưới div comment-list -->
 
-                            <h3 class="theh">0 Thảo luận</h3>
+                            <h3 class="theh"><?php echo $result_comment['total']; ?> Thảo luận</h3>
                             <div id="comment-list"></div>
                             <button id="load-more-comments" type="button">Xem thêm</button>
 
@@ -544,7 +570,70 @@ if ($manga_result->num_rows > 0) {
                                     <!-- Hiển thị ngôi sao và điểm tương ứng -->
                                     <div class="star-container">
 
-                                        <h2 class="acd">Chờ Em Đào Hôn Lâu Lắm Rồi</h2>Không có đánh giá.
+                                        <h2 class="acd"><?php echo $result['manga_name']; ?></h2>
+
+                                        <?php
+                                        $queryRate = "SELECT 
+                                        AVG(rate_character_personality) AS avg_personality, 
+                                        AVG(rate_plot_content) AS avg_plot, 
+                                        AVG(rate_world_layout) AS avg_world, 
+                                        AVG(rate_translation_quality) AS avg_translation,
+                                        COUNT(manga_id) AS rating
+                                    FROM manga_rate 
+                                    WHERE manga_id = ?";
+                                        $stmt = $conn->prepare($queryRate);
+                                        $stmt->bind_param('i', $manga_id);
+                                        $stmt->execute();
+                                        $resultTotal = $stmt->get_result();
+                                        $total = 0;
+                                        if ($resultTotal->num_rows > 0) {
+                                            $row = $resultTotal->fetch_assoc();
+                                            // Tính trung bình tổng các cột
+                                            $total = ($row['avg_personality'] + $row['avg_plot'] + $row['avg_world'] + $row['avg_translation']) / 4;
+                                        }
+                                        $stmt->close();
+
+                                        /*************  ✨ Codeium Command ⭐  *************/
+                                        /**
+                                         * Hiển thị số sao dựa trên rating
+                                         *
+                                         * @param float $rating Điểm đánh giá (từ 0 đến 5)
+                                         *
+                                         * @return string Chuỗi các sao (tối đa 5 sao)
+                                         */
+                                        /******  aac0d35f-8460-404b-8dfa-6b82f7f29da7  *******/
+                                        function displayStars($rating)
+                                        {
+                                            $starsOutput = '';
+                                            $fullStars = floor($rating);
+                                            $halfStar = ($rating - $fullStars >= 0.5) ? true : false;
+
+                                            // Hiển thị số sao đầy
+                                            for ($i = 0; $i < $fullStars; $i++) {
+                                                $starsOutput .= '⭐';
+                                            }
+
+                                            // Hiển thị nửa sao nếu có
+                                            if ($halfStar) {
+                                                $starsOutput .= '⭐';
+                                            }
+
+                                            // Hiển thị số sao trống
+                                            $remainingStars = 5 - $fullStars - ($halfStar ? 1 : 0);
+                                            for ($i = 0; $i < $remainingStars; $i++) {
+                                                $starsOutput .= '☆'; // Dùng biểu tượng sao rỗng
+                                            }
+
+                                            return $starsOutput;
+                                        }
+
+                                        if ($total > 0) {
+                                            echo displayStars($total);
+                                        } else {
+                                            echo "Không có đánh giá nào";
+                                        }
+                                        ?>
+
 
 
                                     </div>

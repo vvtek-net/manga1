@@ -6,7 +6,7 @@ include('config/db_connection.php');
 // var_dump($_GET['cottruyen']);
 // var_dump($_GET['bocuc']);
 // var_dump($_GET['chatluong']);
-// var_dump($_GET['noidung']);
+
 // var_dump($_GET['manga_id']);
 // exit();
 if (
@@ -14,14 +14,14 @@ if (
     isset($_GET['cottruyen']) &&
     isset($_GET['bocuc']) &&
     isset($_GET['chatluong']) &&
-    isset($_GET['noidung']) &&
+    // isset($_GET['noidung']) &&
     isset($_GET['manga_id'])  // Bạn cần truyền manga_id từ URL hoặc ẩn trong form
 ) {
     $tinhcach = intval($_GET['tinhcach']);
     $cottruyen = intval($_GET['cottruyen']);
     $bocuc = intval($_GET['bocuc']);
     $chatluong = intval($_GET['chatluong']);
-    $noidung = $_GET['noidung'];
+    // $noidung = $_GET['noidung'];
     $manga_id = intval($_GET['manga_id']); // Manga ID nhận từ form hoặc URL
 
     // Chuẩn bị câu truy vấn để chèn đánh giá vào bảng manga_rate
@@ -32,7 +32,7 @@ if (
     // Thực hiện truy vấn và kiểm tra kết quả
     if ($stmt->execute()) {
         echo "success"; // Thông báo thành công
-        header("Location: story_detail.php?manga_id=" . $manga_id);
+        header("Location: story.php?manga_id=" . $manga_id);
     } else {
         echo "error: " . $stmt->error; // Thông báo lỗi
     }

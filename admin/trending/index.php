@@ -91,9 +91,11 @@ $result = $conn->query($query);
 
 <body>
 
-     <!-- Sidebar -->
-     <div class="sidebar">
-        <a href="../index.php"><h2>Dashboard</h2></a>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <a href="../index.php">
+            <h2>Dashboard</h2>
+        </a>
         <!-- Accounts Section -->
         <div class="toggle-btn" onclick="toggleMenu('accounts-menu')">
             <span>Tài Khoản</span>
@@ -129,7 +131,21 @@ $result = $conn->query($query);
             <span>Danh Mục Trending</span>
             <span>&#9660;</span>
         </div>
-        <a href="../logout.php">Đăng Xuất</a>
+        <ul id="trending-menu">
+            <li><a href="../trending/index.php">Loại Trending</a></li>
+            <li><a href="../trending/create.php">Thêm Mới</a></li>
+        </ul>
+
+        <!-- Affiliate Section -->
+        <div class="toggle-btn" onclick="toggleMenu('aff-menu')">
+            <span>Affiliate</span>
+            <span>&#9660;</span>
+        </div>
+        <ul id="aff-menu">
+            <li><a href="../affiliate/index.php">View affiliate</a></li>
+            <li><a href="../affiliate/create.php">Create affiliate</a></li>
+        </ul>
+        <a href="../config/logout.php">Đăng Xuất</a>
     </div>
 
     <div class="content">
