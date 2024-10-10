@@ -49,7 +49,7 @@ while ($row = $result_chapters->fetch_assoc()) {
 <!-- Mirrored from truyentalespot.com/index.php?quanly=doc&id_truyen=108&id_chuong=11309 by HTTrack Website Copier/3.x [XR&CO'2014], Sat, 28 Sep 2024 12:47:19 GMT -->
 <!-- Added by HTTrack -->
 <meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <head>
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-JTT7JZT6DT"></script>

@@ -131,7 +131,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
 
     <div class="container">
-        <h1>Edit Account</h1>
+        <h1>Sửa thông tin tài khoản</h1>
 
         <?php if ($account): // Check if the account data exists 
         ?>
@@ -139,26 +139,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <input type="hidden" name="acc_id" value="<?= $account['acc_id'] ?>">
 
                 <div class="form-field">
-                    <label for="username">Username:</label>
+                    <label for="username">Username</label>
                     <input type="text" id="username" name="username" value="<?= $account['username'] ?>" required>
                 </div>
 
                 <div class="form-field">
-                    <label for="fullname">Fullname:</label>
+                    <label for="fullname">Fullname</label>
                     <input type="text" id="fullname" name="fullname" value="<?= $account['fullname'] ?>" required>
                 </div>
 
                 <div class="form-field">
-                    <label for="password">Password <span class="optional-info">(Leave blank if not changing)</span>:</label>
+                    <label for="password">Password <span class="optional-info">(Bỏ qua nếu mật khẩu không đổi)</span></label>
                     <input type="password" id="password" name="password">
                 </div>
 
                 <div class="form-field">
-                    <label for="role_id">Role ID:</label>
+                    <label for="role_id">Role ID<span class="optional-info"> ( 1 là Admin, 2 là User)</span></label>
                     <input type="number" id="role_id" name="role_id" value="<?= $account['role_id'] ?>" required>
                 </div>
 
-                <input type="submit" value="Update">
+                <input type="submit" value="Cập Nhật">
             </form>
         <?php else: ?>
             <p>No account found. Please go back and try again.</p>
