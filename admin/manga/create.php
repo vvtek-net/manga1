@@ -41,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $imgurl = basename($_FILES["imgurl"]["name"]);
 
             // Thêm dữ liệu vào database
-            $query = "INSERT INTO manga (manga_name, author, description, imgurl) VALUES (?, ?, ?, ?)";
+            $query = "INSERT INTO manga (manga_name, author, description, imgurl, type_id) VALUES (?, ?, ?, ?, 1)";
             $stmt = $conn->prepare($query);
             $stmt->bind_param('ssss', $manga_name, $author, $description, $imgurl);
             $stmt->execute();
@@ -155,7 +155,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
 
     <h1>Tạo Manga Mới</h1>
-    <form action="create.php" method="post" enctype="multipart/form-data">
+    <form action="" method="post" enctype="multipart/form-data">
         <label for="manga_name">Tên Manga:</label>
         <input type="text" id="manga_name" name="manga_name" required>
 

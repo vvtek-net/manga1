@@ -141,70 +141,94 @@ while ($row = $result_manga_views->fetch_assoc()) {
 
     <!-- Sidebar -->
     <div class="sidebar">
-        <a href="index.php"><h2>Dashboard</h2></a>
+        <a href="index.php">
+            <h2>Dashboard</h2>
+        </a>
         <!-- Accounts Section -->
         <div class="toggle-btn" onclick="toggleMenu('accounts-menu')">
-            <span>Accounts</span>
+            <span>Tài Khoản</span>
             <span>&#9660;</span>
         </div>
         <ul id="accounts-menu">
-            <li><a href="accounts/index.php">View Accounts</a></li>
-            <li><a href="accounts/create.php">Create Account</a></li>
+            <li><a href="accounts/index.php">Quản Lý Tài Khoản</a></li>
+            <li><a href="accounts/create.php">Tạo Tài Khoản</a></li>
         </ul>
 
         <!-- Manga Section -->
         <div class="toggle-btn" onclick="toggleMenu('manga-menu')">
-            <span>Manga</span>
+            <span>Truyện</span>
             <span>&#9660;</span>
         </div>
         <ul id="manga-menu">
-            <li><a href="manga/index.php">View Manga</a></li>
-            <li><a href="manga/create.php">Create Manga</a></li>
+            <li><a href="manga/index.php">Danh Sách Truyện</a></li>
+            <li><a href="manga/create.php">Thêm Mới Truyện</a></li>
         </ul>
 
         <!-- Manga Type Section -->
         <div class="toggle-btn" onclick="toggleMenu('manga-type-menu')">
-            <span>Manga Type</span>
+            <span>Thể Loại Truyện</span>
             <span>&#9660;</span>
         </div>
         <ul id="manga-type-menu">
-            <li><a href="manga_type/index.php">View Manga Types</a></li>
-            <li><a href="manga_type/create.php">Create Manga Type</a></li>
+            <li><a href="manga_type/index.php">Loại Truyện</a></li>
+            <li><a href="manga_type/create.php">Thêm Mới</a></li>
         </ul>
 
         <!-- Trending Section -->
         <div class="toggle-btn" onclick="toggleMenu('trending-menu')">
-            <span>Trending</span>
+            <span>Danh Mục Trending</span>
             <span>&#9660;</span>
         </div>
         <ul id="trending-menu">
-            <li><a href="trending/index.php">View Trending</a></li>
-            <li><a href="trending/create.php">Create Trending</a></li>
+            <li><a href="trending/index.php">Loại Trending</a></li>
+            <li><a href="trending/create.php">Thêm Mới</a></li>
         </ul>
+
+        <!-- Affiliate Section -->
+        <div class="toggle-btn" onclick="toggleMenu('aff-menu')">
+            <span>Affiliate</span>
+            <span>&#9660;</span>
+        </div>
+        <ul id="aff-menu">
+            <li><a href="affiliate/index.php">Danh Sách Link Aff</a></li>
+            <li><a href="affiliate/create.php">Tạo Link Aff</a></li>
+        </ul>
+
+        <!-- Completed Section -->
+        <div class="toggle-btn" onclick="toggleMenu('completed-menu')">
+            <span>Truyện hoàn thành</span>
+            <span>&#9660;</span>
+        </div>
+        <ul id="completed-menu">
+            <li><a href="completed/index.php">Danh sách truyện</a></li>
+            <li><a href="completed/create.php">Thêm mới</a></li>
+        </ul>
+
+        <a href="../config/logout.php">Đăng Xuất</a>
     </div>
 
     <!-- Main content -->
     <div class="content">
-        <h1>Admin Dashboard</h1>
+        <h1>Trang Quản Trị</h1>
 
         <div class="row">
             <div class="col-md-6">
                 <div class="stat-box">
-                    <h3>Total Accounts</h3>
+                    <h3>Số Lượng Tài Khoản</h3>
                     <p><?= $row_accounts['total_accounts'] ?> Accounts</p>
                 </div>
             </div>
 
             <div class="col-md-6">
                 <div class="stat-box">
-                    <h3>Total Manga</h3>
+                    <h3>Số Lượng Truyện</h3>
                     <p><?= $row_manga['total_manga'] ?> Manga</p>
                 </div>
             </div>
         </div>
 
         <div class="row">
-            <h2 class="text-center my-4">Top 5 Manga by Views</h2>
+            <h2 class="text-center my-4">Top 5 Truyện Có View Cao Nhất</h2>
             <div class="col-12">
                 <div class="chart-container">
                     <canvas id="mangaChart"></canvas>

@@ -9,5 +9,5 @@ session_unset();
 session_destroy();
 
 // Chuyển hướng người dùng về trang đăng nhập hoặc trang chủ
-header("Location: ../login.php"); // Bạn có thể chuyển hướng tới bất kỳ trang nào mong muốn
+header("Location: ../../login.php"); // Bạn có thể chuyển hướng tới bất kỳ trang nào mong muốn
 exit();

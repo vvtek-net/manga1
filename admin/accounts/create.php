@@ -99,7 +99,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <div class="container">
         <h1>Create Account</h1>
-        <form action="create.php" method="post">
+        <form action="" method="post">
             <div class="form-field">
                 <label for="username">Username:</label>
                 <input type="text" id="username" name="username" required>

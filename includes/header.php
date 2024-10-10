@@ -112,7 +112,13 @@ if ($result_trending && $result_trending->num_rows > 0) {
             <!-- Kiểm tra trạng thái đăng nhập -->
             <?php if (isset($_SESSION['fullname'])): ?>
                 <li class="nav-item">
-                    <span class="nav-link">Xin chào, <?= htmlspecialchars($_SESSION['fullname']); ?></span>
+                    <?php
+                    if ($_SESSION['role_id'] == 1) {
+                        echo '<span class="nav-link"><a href="admin/index.php">Xin chào ' . $_SESSION['fullname'] . '</a></span>';
+                    } else {
+                        echo '<span class="nav-link">Xin chào, = htmlspecialchars(' . $_SESSION['fullname'] . ');</span>';
+                    }
+                    ?>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="config/logout.php">Đăng Xuất</a>

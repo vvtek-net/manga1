@@ -50,6 +50,7 @@ while ($row = $result_chapters->fetch_assoc()) {
 <!-- Added by HTTrack -->
 <meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <head>
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-JTT7JZT6DT"></script>
@@ -132,6 +133,15 @@ while ($row = $result_chapters->fetch_assoc()) {
         .comment-content h4 {
             margin-top: 0;
             margin-bottom: 0;
+        }
+
+        #submit-comment:hover {
+            opacity: 0.7;
+        }
+
+        .next-chapter a:hover,
+        .prev-chapter a:hover {
+            background-color: #ccc;
         }
     </style>
 </head>
@@ -255,8 +265,6 @@ while ($row = $result_chapters->fetch_assoc()) {
 
 
                 <!-- Nội dung chính -->
-
-
                 <div class="content-container">
                     <div class="contents-container">
                         <div id="settingsPanel" class="settings-panel"><button id="closeBtn" class="close-btn">&times;</button>
@@ -340,9 +348,9 @@ while ($row = $result_chapters->fetch_assoc()) {
                                 ?>
                             </div>
                             <div class="settings-menu">
-                                <div id="settingsIcon" class="settings-icon" onclick="toggleSettingsPanel()"><i class="fa-solid fa-gear"></i> Tùy chỉnh</div>
+                                <!-- <div id="settingsIcon" class="settings-icon" onclick="toggleSettingsPanel()"><i class="fa-solid fa-gear"></i> Tùy chỉnh</div> -->
                                 <div id="chapterIcon" class="chapter-icon" onclick="toggleChapterModal()"><i class="fa-solid fa-list-ul"></i> Mục lục</div>
-                                <div id="bookmarkIcon" class="bookmark-icon" onclick="alert('Vui lòng đăng nhập để đánh dấu.');"><i class="fa-solid fa-bookmark"></i> Đánh dấu</div>
+                                <!-- <div id="bookmarkIcon" class="bookmark-icon" onclick="alert('Vui lòng đăng nhập để đánh dấu.');"><i class="fa-solid fa-bookmark"></i> Đánh dấu</div> -->
                             </div>
                             <h2><a class="tentieude" href="story.php?manga_id=<?php echo $_GET['manga_id']; ?>"><?php echo $result['manga_name']; ?></a></h2>
                             <h3 class="chuong_ten"><?php echo $chapter['chapter_name']; ?></h3><i class="chuong_ten">Ngày cập nhật : <?php echo  $updateAtDate->format('d-m-Y'); ?></i>
@@ -479,57 +487,105 @@ while ($row = $result_chapters->fetch_assoc()) {
                             <div class="chapter-navigation">
                                 <div class="comments-section">
                                     <h3>Bình Luận</h3>
-                                    <form id="comment-form" method="get" action="submit_comment.php">
-                                        <label for="comment">Nhập bình luận của bạn:</label>
-                                        <textarea name="comment" id="comment" rows="4" required></textarea>
-                                        <input type="hidden" name="manga_id" id="manga_id" value="<?php echo $manga_id; ?>">
-                                        <input type="hidden" name="chapter_id" id="chapter_id" value="<?php echo $chapter_id; ?>">
+                                    <?php
+                                    if (isset($manga_id) && isset($chapter['chapter_id'])) {
 
-                                        <input type="submit" id="submit-comment" value="Đăng Bình Luận">
-                                    </form>
-                                    <p id="login-prompt" style="display: none;">Vui lòng <a href="indexe536.html?quanly=dangnhap">đăng nhập</a> để bình luận.</p>
-                                    <!-- Bên dưới div comment-list -->
-
-                                    <h3 class="theh">0 Thảo luận </h3>
-                                    <div id="comment-list">
-                                        <!-- select all comments includes manga_id and chapter_id -->
-                                        <?php
-                                        // Assuming $manga_id and $chapter['chapter_id'] are properly set before this block
-                                        if (isset($manga_id) && isset($chapter['chapter_id'])) {
-
-                                            // Inner Join accounts and manga_comment
-                                            $query = "SELECT * FROM accounts INNER JOIN manga_comment ON accounts.acc_id = manga_comment.acc_id WHERE manga_id = ? AND chapter_id = ?";
-                                            $stmt = $conn->prepare($query);
-                                            $stmt->bind_param('ii', $manga_id, $chapter['chapter_id']);
-                                            $stmt->execute();
-                                            $result = $stmt->get_result();
-                                            $comments = []; // Initialize comments variable
-                                            while ($row = $result->fetch_assoc()) {
-                                                $comments[] = $row;
-                                            }
-
-                                            foreach ($comments as $comment) {
-                                                echo '<div class="comment-item">
-            <div class="comment-avatar">
-                <img src="assets/image/avatar.jpg" alt="Avatar" width="40" height="40">
-            </div>
-            <div class="comment-content">
-                <h4>' . htmlspecialchars($comment['fullname'], ENT_QUOTES, 'UTF-8') . '</h4>
-                <p>' . htmlspecialchars($comment['comment'], ENT_QUOTES, 'UTF-8') . '</p>
-            </div>
-          </div>';
-                                            }
+                                        // Inner Join accounts and manga_comment
+                                        $query = "SELECT * FROM accounts INNER JOIN manga_comment ON accounts.acc_id = manga_comment.acc_id WHERE manga_id = ? AND chapter_id = ?";
+                                        $stmt = $conn->prepare($query);
+                                        $stmt->bind_param('ii', $manga_id, $chapter['chapter_id']);
+                                        $stmt->execute();
+                                        $result = $stmt->get_result();
+                                        $comments = []; // Initialize comments variable
+                                        while ($row = $result->fetch_assoc()) {
+                                            $comments[] = $row;
                                         }
+                                    ?>
+                                        <form id="comment-form" method="get" action="submit_comment.php">
+                                            <label for="comment">Nhập bình luận của bạn:</label>
+                                            <textarea name="comment" id="comment" rows="4" required></textarea>
+                                            <input type="hidden" name="manga_id" id="manga_id" value="<?php echo $manga_id; ?>">
+                                            <input type="hidden" name="chapter_id" id="chapter_id" value="<?php echo $chapter_id; ?>">
+
+                                            <input style="padding: 8px 10px; background-color: #5db85c; color: #fff; cursor: pointer;" type="submit" id="submit-comment" value="Đăng Bình Luận">
+                                        </form>
+                                        <p id="login-prompt" style="display: none;">Vui lòng <a href="indexe536.html?quanly=dangnhap">đăng nhập</a> để bình luận.</p>
+                                        <!-- Bên dưới div comment-list -->
+                                        <h3 class="theh"><?php echo (is_array($comments) ? count($comments) : 0) . " Thảo luận"; ?> </h3>
+                                        <div id="comment-list">
+                                            <!-- select all comments includes manga_id and chapter_id -->
+
+                                        <?php
+
+                                        $commentsPerPage = 5; // Số lượng bình luận hiển thị mỗi lần
+                                        $totalComments = count($comments); // Tổng số bình luận
+
+                                        // Lấy tối đa 5 bình luận đầu tiên
+                                        $displayComments = array_slice($comments, 0, $commentsPerPage);
+
+                                        // Assuming $manga_id and $chapter['chapter_id'] are properly set before this block
+                                        // foreach ($comments as $comment) {
+                                        //     echo '<div class="comment-item">
+                                        //             <div class="comment-avatar">
+                                        //                 <img src="assets/image/avatar.jpg" alt="Avatar" width="40" height="40">
+                                        //             </div>
+                                        //             <div class="comment-content">
+                                        //                 <h4>' . htmlspecialchars($comment['fullname'], ENT_QUOTES, 'UTF-8') . '</h4>
+                                        //                 <p>' . htmlspecialchars($comment['comment'], ENT_QUOTES, 'UTF-8') . '</p>
+                                        //             </div>
+                                        //         </div>';
+                                        // }
+                                    }
                                         ?>
-
-
-                                    </div>
-                                    <button id="load-more-comments" type="button">Xem thêm</button>
-                                    <div id="pagination"></div>
+                                        </div>
+                                        <button id="load-more-comments" type="button">Xem thêm</button>
+                                        <div id="pagination"></div>
                                 </div>
                             </div>
                         </div>
+
                         <script>
+                            document.addEventListener('DOMContentLoaded', function() {
+                                let currentPage = 0;
+                                const commentsPerPage = 5;
+                                const totalComments = <?php echo $totalComments; ?>; // Tổng số bình luận
+                                const comments = <?php echo json_encode($comments); ?>; // Bình luận từ PHP
+
+                                // Hàm để hiển thị thêm bình luận
+                                function loadMoreComments() {
+                                    const start = currentPage * commentsPerPage;
+                                    const end = start + commentsPerPage;
+                                    const newComments = comments.slice(start, end);
+
+                                    newComments.forEach(comment => {
+                                        const commentHtml = `<div class="comment-item">
+                                                     <div class="comment-avatar">
+                                                        <img src="assets/image/avatar.jpg" alt="Avatar" width="40" height="40">
+                                                    </div>
+                                                    <div class="comment-content">
+                                                        <h4>${comment.fullname}</h4>
+                                                        <p>${comment.comment}</p>
+                                                    </div>
+                                                </div>`;
+                                        document.getElementById('comment-list').insertAdjacentHTML('beforeend', commentHtml);
+                                    });
+
+                                    currentPage++;
+
+                                    // Ẩn nút nếu không còn bình luận
+                                    if (currentPage * commentsPerPage >= totalComments) {
+                                        document.getElementById('load-more-comments').style.display = 'none';
+                                    }
+                                }
+
+                                // Gọi hàm loadMoreComments() khi truy cập trang
+                                loadMoreComments();
+
+                                // Hiển thị thêm bình luận khi nhấn nút "Xem thêm"
+                                document.getElementById('load-more-comments').addEventListener('click', loadMoreComments);
+                            });
+                        </script>
+                        <!-- <script>
                             document.addEventListener("DOMContentLoaded", function() {
                                 var submitButton = document.getElementById('submit-comment');
                                 var commentInput = document.getElementById('comment');
@@ -650,9 +706,9 @@ while ($row = $result_chapters->fetch_assoc()) {
                                 // Tải danh sách bình luận ban đầu khi trang được tải
                                 loadComments(idTruyen, idChuong, offset);
                             });
-                        </script>
+                        </script> -->
 
-                        <script>
+                        <!-- <script>
                             function bookmarkChapter(id_truyen, chapterId, userId) {
                                 var data = {
                                     'id_truyen': id_truyen,
@@ -707,7 +763,7 @@ while ($row = $result_chapters->fetch_assoc()) {
                                     }
                                 });
                             }
-                        </script>
+                        </script> -->
                         <script>
                             function toggleChapterModal() {
                                 var chapterModal = document.getElementById("chapterModal");
@@ -746,7 +802,7 @@ while ($row = $result_chapters->fetch_assoc()) {
 
                             // Gọi hàm navigateToChapter khi trang được tải
                         </script>
-                        <script>
+                        <!-- <script>
                             document.addEventListener('DOMContentLoaded', function() {
                                 var settingsPanel = document.getElementById('settingsPanel');
                                 var closeBtn = document.getElementById('closeBtn'); // Lấy nút "X"
@@ -799,7 +855,7 @@ while ($row = $result_chapters->fetch_assoc()) {
                                 // Bỏ qua việc gọi closeSettingsPanel() ở đây vì chúng ta không muốn nó bật lên rồi tắt ngay khi trang tải xong
                                 // closeSettingsPanel();
                             });
-                        </script>
+                        </script> -->
 
                         <script>
                             // Hàm giải mã nội dung đã mã hóa

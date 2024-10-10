@@ -1,6 +1,10 @@
 <?php
 include '../config/db_connection.php';
-$query = "SELECT * FROM manga";
+
+// Fetch data from the manga_affiliate table
+$query = "SELECT a.aff_id, a.manga_id, m.manga_name, a.aff_link, a.update_at 
+          FROM manga_affiliate a 
+          JOIN manga m ON a.manga_id = m.manga_id";
 $result = $conn->query($query);
 ?>
 
@@ -10,10 +14,9 @@ $result = $conn->query($query);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Manga</title>
+    <title>Quản lý Affiliates</title>
     <link rel="stylesheet" href="../../assets/css/styles.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-
     <style>
         body {
             display: flex;
@@ -86,10 +89,10 @@ $result = $conn->query($query);
             background-color: rgba(255, 255, 255, 0.3);
         }
     </style>
-
 </head>
 
 <body>
+
     <!-- Sidebar -->
     <div class="sidebar">
         <a href="../index.php">
@@ -141,34 +144,37 @@ $result = $conn->query($query);
             <span>&#9660;</span>
         </div>
         <ul id="aff-menu">
-            <li><a href="../affiliate/index.php">View affiliate</a></li>
-            <li><a href="../affiliate/create.php">Create affiliate</a></li>
+            <li><a href="index.php">View affiliate</a></li>
+            <li><a href="create.php">Create affiliate</a></li>
         </ul>
 
         <a href="../logout.php">Đăng Xuất</a>
     </div>
+
     <div class="content">
-        <h1>Danh Sách Truyện</h1>
-        <a class="btn btn-success" href="create.php">Thêm Truyện Mới</a>
+        <h1>Danh Sách Affiliate</h1>
+        <a href="create.php" class="btn btn-success">Thêm Affiliate</a>
 
         <table class="table" border="1">
             <thead>
                 <tr>
+                    <th>ID</th>
                     <th>Tên Truyện</th>
-                    <th>Lượt Xem</th>
-                    <th>Tác Giả</th>
+                    <th>Liên Kết Affiliate</th>
+                    <th>Ngày Cập Nhật</th>
                     <th>Hành Động</th>
                 </tr>
             </thead>
             <tbody>
                 <?php while ($row = $result->fetch_assoc()): ?>
                     <tr>
+                        <td><?= $row['aff_id'] ?></td>
                         <td><?= $row['manga_name'] ?></td>
-                        <td><?= $row['view_number'] ?></td>
-                        <td><?= $row['author'] ?></td>
+                        <td><a href="<?= $row['aff_link'] ?>" target="_blank"><?= $row['aff_link'] ?></a></td>
+                        <td><?= $row['update_at'] ?></td>
                         <td>
-                            <a href="edit.php?id=<?= $row['manga_id'] ?>" class="btn btn-warning">Sửa</a>
-                            <a href="delete.php?id=<?= $row['manga_id'] ?>" onclick="return confirm('Are you sure?')" class="btn btn-danger">Xóa</a>
+                            <a href="edit.php?id=<?= $row['aff_id'] ?>&manga_id=<?= $row['manga_id'] ?>&manga_name=<?= $row['manga_name'] ?>" class="btn btn-warning">Sửa</a>
+                            <a href="delete.php?id=<?= $row['aff_id'] ?>" onclick="return confirm('Are you sure?')" class="btn btn-danger">Xóa</a>
                         </td>
                     </tr>
                 <?php endwhile; ?>

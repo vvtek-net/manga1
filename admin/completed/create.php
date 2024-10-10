@@ -1,16 +1,33 @@
 <?php
+session_start();
 include '../config/db_connection.php';
 
+// Kiểm tra xem form có được submit không
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $trending_name = $_POST['trending_name'];
+    $manga_id = $_POST['manga_id'];
 
-    $query = "INSERT INTO trending (trending_name) VALUES (?)";
-    $stmt = $conn->prepare($query);
-    $stmt->bind_param('s', $trending_name);
+    // Kiểm tra xem manga_id đã tồn tại trong bảng manga_completed hay chưa
+    $check_query = "SELECT * FROM manga_completed WHERE manga_id = ?";
+    $stmt = $conn->prepare($check_query);
+    $stmt->bind_param("i", $manga_id);
     $stmt->execute();
+    $result = $stmt->get_result();
 
-    header('Location: index.php');
-    exit();
+    if ($result->num_rows > 0) {
+        // Nếu truyện đã tồn tại
+        $_SESSION['warning'] = "Truyện này đã được thêm, vui lòng chọn truyện khác.";
+    } else {
+        // Nếu truyện chưa tồn tại, tiến hành thêm mới
+        $body = "INSERT INTO manga_completed (manga_id, update_at) VALUES (?, NOW())";
+        $stmt = $conn->prepare($body);
+        $stmt->bind_param("i", $manga_id);
+        if ($stmt->execute()) {
+            header('Location: index.php');
+            exit();
+        } else {
+            $_SESSION['warning'] = "Đã xảy ra lỗi khi thêm truyện.";
+        }
+    }
 }
 ?>
 
@@ -20,8 +37,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Trending</title>
+    <title>Tạo Manga Mới</title>
+    <script src="../resources/ckeditor/ckeditor.js"></script> <!-- CKEditor -->
     <link rel="stylesheet" href="../../assets/css/styles.css">
+
     <style>
         body {
             display: flex;
@@ -105,16 +124,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .form-field {
             margin-bottom: 15px;
         }
+
+        select#manga_id {
+            padding: 10px;
+            margin-top: 5px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            width: 100%;
+            box-sizing: border-box;
+        }
     </style>
+
 </head>
 
 <body>
 
-    <h1>Create Trending</h1>
-    <form action="" method="post">
-        <label for="trending_name">Trending Name:</label>
-        <input type="text" id="trending_name" name="trending_name" required>
-        <input type="submit" value="Create">
+    <h1>Tạo Manga Mới</h1>
+    <form action="" method="post" enctype="multipart/form-data">
+
+        <label for="manga_id">Tên Manga:</label>
+        <!-- <input type="text" id="manga_name" name="manga_name" required> -->
+        <select name="manga_id" id="manga_id">
+            <option value="">-- Chọn truyện --</option>
+            <?php
+            $query = "SELECT * FROM manga";
+            $result = $conn->query($query);
+            while ($row = $result->fetch_assoc()) {
+                echo '<option value="' . $row['manga_id'] . '">' . $row['manga_name'] . '</option>';
+            }
+            ?>
+        </select>
+        <?php
+        if (isset($_SESSION['warning'])) {
+            echo '<div class="warning" style="color: red;">' . $_SESSION['warning'] . '</div>';
+            unset($_SESSION['warning']);
+        }
+        ?>
+        <input type="submit" value="Tạo">
     </form>
 
 </body>

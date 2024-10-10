@@ -1,12 +1,24 @@
 <?php
 include '../config/db_connection.php';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $trending_name = $_POST['trending_name'];
-
-    $query = "INSERT INTO trending (trending_name) VALUES (?)";
+if (isset($_GET['id'])) {
+    $aff_id = $_GET['id'];
+    $query = "SELECT * FROM manga_affiliate WHERE aff_id = ?";
     $stmt = $conn->prepare($query);
-    $stmt->bind_param('s', $trending_name);
+    $stmt->bind_param('i', $aff_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $affiliate = $result->fetch_assoc();
+    $manga_id = $affiliate['manga_id']; // Lưu manga_id
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $aff_id = $_POST['aff_id'];
+    $product = $_POST['product_name'];
+
+    $query = "UPDATE manga_affiliate SET product_name = ? WHERE aff_id = ?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param('si', $product, $aff_id);
     $stmt->execute();
 
     header('Location: index.php');
@@ -20,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Trending</title>
+    <title>Edit Trending</title>
     <link rel="stylesheet" href="../../assets/css/styles.css">
     <style>
         body {
@@ -105,16 +117,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .form-field {
             margin-bottom: 15px;
         }
+
+        select#manga_id {
+            padding: 10px;
+            margin-top: 5px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            width: 100%;
+            box-sizing: border-box;
+        }
     </style>
 </head>
 
 <body>
 
-    <h1>Create Trending</h1>
+    <h1>Sửa Affiliate</h1>
     <form action="" method="post">
-        <label for="trending_name">Trending Name:</label>
-        <input type="text" id="trending_name" name="trending_name" required>
-        <input type="submit" value="Create">
+        <label for="manga_id">Tên truyện:</label>
+        <select name="manga_id" id="manga_id">
+            <?php
+            $query = "SELECT * FROM manga";
+            $stmt = $conn->prepare($query);
+            $stmt->execute();
+            $result = $stmt->get_result();
+
+            ?>
+            <option value="">-- Chọn truyện --</option>
+            <?php
+            while ($row = $result->fetch_assoc()) {
+                // Kiểm tra nếu manga_id tương ứng với affiliate
+                $selected = ($row['manga_id'] == $manga_id) ? 'selected' : '';
+                echo '<option value="' . $row['manga_id'] . '" ' . $selected . '>' . $row['manga_name'] . '</option>';
+            }
+            ?>
+        </select>
+
+        <label for="aff_name">Link Affiliate:</label>
+        <input type="text" id="aff_name" name="aff_name" required value="<?= $affiliate['aff_link'] ?>">
+
+        <label for="product">Tên sản phẩm:</label>
+        <input type="text" id="product" name="product" required value="<?= $affiliate['product_name'] ?>">
+
+        <input type="submit" value="Cập nhật">
     </form>
 
 </body>

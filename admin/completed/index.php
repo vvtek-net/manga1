@@ -1,6 +1,8 @@
 <?php
 include '../config/db_connection.php';
-$query = "SELECT * FROM manga";
+$query = "SELECT manga_completed.*, manga.manga_name, manga.author 
+          FROM manga_completed 
+          INNER JOIN manga ON manga_completed.manga_id = manga.manga_id";
 $result = $conn->query($query);
 ?>
 
@@ -145,17 +147,26 @@ $result = $conn->query($query);
             <li><a href="../affiliate/create.php">Create affiliate</a></li>
         </ul>
 
+        <!-- Completed Section -->
+        <div class="toggle-btn" onclick="toggleMenu('completed-menu')">
+            <span>Truyện hoàn thành</span>
+            <span>&#9660;</span>
+        </div>
+        <ul id="completed-menu">
+            <li><a href="../completed/index.php">Danh sách truyện</a></li>
+            <li><a href="../completed/create.php">Thêm mới</a></li>
+        </ul>
+
         <a href="../logout.php">Đăng Xuất</a>
     </div>
     <div class="content">
-        <h1>Danh Sách Truyện</h1>
+        <h1>Danh Sách Truyện Đã Hoàn Thành</h1>
         <a class="btn btn-success" href="create.php">Thêm Truyện Mới</a>
 
         <table class="table" border="1">
             <thead>
                 <tr>
                     <th>Tên Truyện</th>
-                    <th>Lượt Xem</th>
                     <th>Tác Giả</th>
                     <th>Hành Động</th>
                 </tr>
@@ -164,11 +175,9 @@ $result = $conn->query($query);
                 <?php while ($row = $result->fetch_assoc()): ?>
                     <tr>
                         <td><?= $row['manga_name'] ?></td>
-                        <td><?= $row['view_number'] ?></td>
                         <td><?= $row['author'] ?></td>
                         <td>
-                            <a href="edit.php?id=<?= $row['manga_id'] ?>" class="btn btn-warning">Sửa</a>
-                            <a href="delete.php?id=<?= $row['manga_id'] ?>" onclick="return confirm('Are you sure?')" class="btn btn-danger">Xóa</a>
+                            <a href="delete.php?id=<?= $row['complete_id'] ?>" onclick="return confirm('Are you sure?')" class="btn btn-danger">Xóa</a>
                         </td>
                     </tr>
                 <?php endwhile; ?>
