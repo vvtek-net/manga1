@@ -66,7 +66,7 @@ while ($row = $result_chapters->fetch_assoc()) {
     </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chờ Em Đào Hôn Lâu Lắm Rồi</title>
+    <title><?php echo $result['manga_name']; ?></title>
     <meta property="og:title" content="Chờ Em Đào Hôn Lâu Lắm Rồi" />
     <meta property="og:image" content="https://res.cloudinary.com/deam5w1nh/image/upload/v1725960942/ganscwajrhjzja7eerrx.png" />
     <meta property="og:url" content="https://truyentalespot.com/index.php?quanly=thongtintruyen&amp;id_truyen=108&amp;id_chuong=11309" />
@@ -121,13 +121,11 @@ while ($row = $result_chapters->fetch_assoc()) {
         }
 
         .comment-content p {
-            /* padding-bottom: 10px; */
-            /* Bỏ margin cho p */
-            margin-top: 5px;
-            color: #333;
-            /* Màu chữ bình luận */
-            line-height: 1.4;
-            /* Khoảng cách giữa các dòng */
+            margin-top: 0;
+            margin-bottom: 0;
+            padding-top: 0;
+            padding-bottom: 0;
+            line-height: 1;
         }
 
         .comment-content h4 {

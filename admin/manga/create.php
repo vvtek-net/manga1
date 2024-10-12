@@ -52,8 +52,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($upload_ok == 1) {
         if (move_uploaded_file($_FILES["imgurl"]["tmp_name"], $target_file)) {
             // Upload thành công, thêm dữ liệu vào database
-            $imgurl = 'assets/image/'.basename($_FILES["imgurl"]["name"]);
-
+            $imgurl = basename($_FILES["imgurl"]["name"]);
+            $imgpath = 'assets/image/'. $imgurl;
+            
             // Thêm dữ liệu vào database với type_id (loại truyện)
             $query = "INSERT INTO manga (manga_name, author, description, imgurl, type_id) VALUES (?, ?, ?, ?, ?)";
             $stmt = $conn->prepare($query);

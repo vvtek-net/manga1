@@ -55,7 +55,7 @@ $manga_result = $stmt->get_result();
                                         <div class="story-item">
                                             <div class="story-thumbnail">
                                                 <div class="image-container">
-                                                    <img alt="<?php echo $row['manga_name']; ?>" src="<?php echo $row['imgurl']; ?>" />
+                                                    <img alt="<?php echo $row['manga_name']; ?>" src="<?php echo 'assets/image/'.$row['imgurl']; ?>" />
                                                     <div class="read-count">
                                                         <i class="fa-solid fa-eye"></i>
                                                         <?php echo $row['view_number']; ?>
@@ -63,11 +63,12 @@ $manga_result = $stmt->get_result();
                                                 </div>
                                             </div>
                                             <div class="story-details">
-                                                <a class="tieude" href="story.php?manga_id=<?php echo $row['manga_id']; ?>">
+                                                <a class="tieude" href="story.php?manga_id=<?php echo $row['manga_id']; ?>" >
                                                     <?php echo $row['manga_name']; ?>
                                                 </a>
                                                 <p class="tomtat_v1">
-                                                    <?php echo $row['description']; ?>
+                                                <?php echo substr($row['description'], 0, 200); ?>
+
                                                 </p>
                                                 <div class="jjskks11">
                                                     <p class="tacgia321">
@@ -106,32 +107,7 @@ $manga_result = $stmt->get_result();
                             $stmt->execute();
                             $chapter_result = $stmt->get_result();
                             ?>
-                            <div class="new-stories-abc">
-                                <h3 class="theh">CHƯƠNG MỚI CẬP NHẬT</h3>
-                                <div class="story-list-abc">
-                                    <table class="chapter-table" style="width: 100%;">
-                                        <tbody>
-                                            <?php while ($chapter_row = $chapter_result->fetch_assoc()) { ?>
-                                                <tr class="chapter-row">
-                                                    <td class="chapter-type"><?php echo $chapter_row['type_name']; ?></td>
-                                                    <td class="chapter-manga">
-                                                        <a href="story.php?manga_id=<?php echo $chapter_row['manga_id']; ?>">
-                                                            <?php echo $chapter_row['manga_name']; ?>
-                                                        </a>
-                                                    </td>
-                                                    <td class="chapter-name">
-                                                        <a href="story_detail.php?manga_id=<?php echo $chapter_row['manga_id']; ?>&chapter_id=<?php echo $chapter_row['chapter_id']; ?>">
-                                                            <?php echo $chapter_row['chapter_name']; ?>
-                                                        </a>
-                                                    </td>
-                                                    <td class="chapter-author"><?php echo $chapter_row['author']; ?></td>
-                                                    <td class="chapter-date"><?php echo date("d-m-Y", strtotime($chapter_row['update_at'])); ?></td>
-                                                </tr>
-                                            <?php } ?>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
+                            
 
 
                             <style>
@@ -202,7 +178,7 @@ $manga_result = $stmt->get_result();
                                             <div style="display: flex; align-items: center; gap: 10px;">
                                                 <span class="rank-number" style="font-weight: bold; font-size: 16px;"><?php echo $rank; ?></span>
                                                 <div class="image-container" style="display: flex; align-items: center;">
-                                                    <img alt="<?php echo $nomination_row['manga_name']; ?>" src="<?php echo $nomination_row['imgurl']; ?>" style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px;" />
+                                                    <img alt="<?php echo $nomination_row['manga_name']; ?>" src="<?php echo 'assets/image/'.$nomination_row['imgurl']; ?>" style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px;" />
                                                     <div class="read-count" style="font-size: 12px; text-align: center;">
                                                         <i class="fa-solid fa-eye"></i> <?php echo $nomination_row['view_number']; ?>
                                                     </div>
@@ -246,7 +222,7 @@ $manga_result = $stmt->get_result();
                                             <div style="display: flex; align-items: center; gap: 10px;">
                                                 <span class="rank-number" style="font-weight: bold; font-size: 16px;"><?php echo $rank; ?></span>
                                                 <div class="image-container" style="display: flex; align-items: center;">
-                                                    <img alt="<?php echo $view_row['manga_name']; ?>" src="<?php echo $view_row['imgurl']; ?>" style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px;" />
+                                                    <img alt="<?php echo $view_row['manga_name']; ?>" src="<?php echo 'assets/image/'.$view_row['imgurl']; ?>" style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px;" />
 
                                                 </div>
                                             </div>
@@ -287,7 +263,7 @@ $manga_result = $stmt->get_result();
                                             <div style="display: flex; align-items: center; gap: 10px;">
                                                 <span class="rank-number" style="font-weight: bold; font-size: 16px;"><?php echo $rank; ?></span>
                                                 <div class="image-container" style="display: flex; align-items: center;">
-                                                    <img alt="<?php echo $completed_row['manga_name']; ?>" src="<?php echo $completed_row['imgurl']; ?>" style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px;" />
+                                                    <img alt="<?php echo $completed_row['manga_name']; ?>" src="<?php echo 'assets/image/'.$completed_row['imgurl']; ?>" style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px;" />
                                                     <div class="read-count" style="font-size: 12px; text-align: center;">
                                                         <i class="fa-solid fa-eye"></i> <?php echo $completed_row['view_number']; ?>
                                                     </div>

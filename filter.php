@@ -6,6 +6,7 @@ include('config/db_connection.php');
 // Kiểm tra xem GET có tồn tại không
 $manga_type = isset($_GET['type_id']) ? $_GET['type_id'] : null;
 $manga_trending = isset($_GET['trending_id']) ? $_GET['trending_id'] : null;
+$type_name = isset($_GET['type_name']) ? $_GET['type_name'] : null;
 
 if ($conn->connect_error) {
     die("Kết nối thất bại: " . $conn->connect_error);
@@ -78,9 +79,9 @@ try {
     </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title></title>
-    <meta property="og:title" content="Truyentalespot" />
-    <meta property="og:description" content="Truyentalespot nền tảng đọc truyện miễn phí" />
+    <title><?php echo $type_name; ?></title>
+    
+    <meta property="og:description" content="Thanhxuanrucro nền tảng đọc truyện miễn phí" />
     <meta property="og:image" content="assets/image/logo.ico" />
     <meta property="og:url" content="https://truyentalespot.com/index.php" />
     <script async src="cdn/pagead2.googlesyndication.com/pagead/js/f26c4.txt?client=ca-pub-9357006487999643"
@@ -92,6 +93,7 @@ try {
     <link rel="stylesheet" href="cdn/cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" />
     <link rel="shortcut icon" type="image/png" href="assets/image/logo.ico">
     <meta name="google-signin-client_id" content="903289929360-7umpc2inp7iov7sbsmnrmpiai16onig9.apps.googleusercontent.com">
+    
 </head>
 
 
@@ -324,7 +326,7 @@ try {
                                                 <div class="story-item">
                                                     <div class="story-thumbnail">
                                                         <!-- Ảnh truyện (thay thế bằng đường dẫn đến hình ảnh từ cơ sở dữ liệu) -->
-                                                        <img src="<?php echo $manga['imgurl']; ?>" alt="<?php echo htmlspecialchars($manga['manga_name']); ?>">
+                                                        <img src="<?php echo 'assets/image/' . $manga['imgurl']; ?>" alt="<?php echo htmlspecialchars($manga['manga_name']); ?>">
                                                     </div>
                                                     <div class="story-details">
                                                         <!-- Thông tin truyện -->
@@ -332,7 +334,7 @@ try {
                                                             <?php echo htmlspecialchars($manga['manga_name']); ?>
                                                         </a>
                                                         <p class="tomtat_v1">
-                                                            <?php echo $manga['description']; ?>
+                                                            <?php echo substr($manga['description'], 0, 200);?>
                                                         </p> <br>
                                                         <p class="tacgia321"><i class="fa-solid fa-user-pen"></i> <?php echo htmlspecialchars($manga['author']); ?></p> <br>
                                                         <a href="index5fc9.html?quanly=truyen&amp;category[]=Xuy%c3%aan%20S%c3%a1ch" class="theloai321">

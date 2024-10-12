@@ -190,8 +190,8 @@ while ($row = $result_manga_views->fetch_assoc()) {
             <span>&#9660;</span>
         </div>
         <ul id="aff-menu">
-            <li><a href="index.php">Danh Sách Link Aff</a></li>
-            <li><a href="create.php">Tạo Link Aff</a></li>
+            <li><a href="affiliate/index.php">Danh Sách Link Aff</a></li>
+            <li><a href="affiliate/create.php">Tạo Link Aff</a></li>
         </ul>
 
         <a href="../config/logout.php">Đăng Xuất</a>

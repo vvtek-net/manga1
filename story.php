@@ -176,7 +176,7 @@ if ($manga_result->num_rows > 0) {
 
                     <div class="containers-acd">
                         <div class="truyen-image-acd">
-                            <img src="<?php echo $result['imgurl']; ?>" alt="Ảnh truyện">
+                            <img src="<?php echo 'assets/image/'.$result['imgurl']; ?>" alt="Ảnh truyện">
                         </div>
                         <div class="truyen-info-acd">
                             <h2 class="acd"><?php echo $result['manga_name']; ?></h2>
@@ -256,9 +256,32 @@ if ($manga_result->num_rows > 0) {
                                 <div class="star-container-123"><i class="fa-star fa-regular" style="color: #ccc;"></i><i class="fa-star fa-regular" style="color: #ccc;"></i><i class="fa-star fa-regular" style="color: #ccc;"></i><i class="fa-star fa-regular" style="color: #ccc;"></i><i class="fa-star fa-regular" style="color: #ccc;"></i><span id="tongdiem-value-123"><?php echo round($total); ?></span><span>/5 (<?php echo $row['rating']; ?> đánh giá)</span></div>
                             </div>
 
+                            <?php
+                                // Truy vấn lấy chapter_id từ bảng chapter theo manga_id
+                                $Query_get_chapter_id = "SELECT chapter_id FROM `chapter` WHERE manga_id = ? ORDER BY chapter_id ASC";
+                                
+                                // Chuẩn bị câu lệnh truy vấn
+                                $stmt_get_chapter_id = $conn->prepare($Query_get_chapter_id);
+                                
+                                // Liên kết biến $manga_id vào câu truy vấn
+                                $stmt_get_chapter_id->bind_param("i", $manga_id);
+                                
+                                // Thực hiện truy vấn
+                                $stmt_get_chapter_id->execute();
+                                
+                                // Lấy kết quả
+                                $result_get_chapter_id = $stmt_get_chapter_id->get_result();
+                                
+                                // Kiểm tra và gán giá trị cho $get_chapter_id
+                                $get_chapter_id = null;
+                                if ($result_get_chapter_id->num_rows > 0) {
+                                    $row_get_chapter_id = $result_get_chapter_id->fetch_assoc();
+                                    $get_chapter_id = $row_get_chapter_id["chapter_id"];
+                                }
+                            ?>
 
                             <div class="buttons-acd">
-                                <a href="story_detail.php?manga_id=<?php echo $manga_id; ?>&chapter_id=1" class="acd1"><i class="fa-solid fa-glasses"></i> Đọc Từ Đầu</a>
+                                <a href="story_detail.php?manga_id=<?php echo $manga_id; ?>&chapter_id=<?php echo $get_chapter_id?>" class="acd1"><i class="fa-solid fa-glasses"></i> Đọc Từ Đầu</a>
                                 <button class="acd3" onclick="submitNomination('<?php echo $manga_id; ?>');"><i class="fa-solid fa-heart"></i> Đề cử </button>
 
                                 <script>

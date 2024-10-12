@@ -23,6 +23,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $manga_id = $_POST['manga_id'];
     $chapter_content = $_POST['chapter_content'];
 
+    // Loại bỏ các thẻ <p> không cần thiết và gộp toàn bộ nội dung vào một thẻ <p>
+    $chapter_content = str_replace('<p>', '', $chapter_content);
+    $chapter_content = str_replace('</p>', '', $chapter_content);
+    $chapter_content = '<p>' . $chapter_content . '</p>';
+
     // Cập nhật dữ liệu
     $query = "UPDATE chapter SET chapter_name = ?, manga_id = ?, chapter_content = ?, update_at = NOW() WHERE chapter_id = ?";
     $stmt = $conn->prepare($query);

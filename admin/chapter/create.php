@@ -11,6 +11,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $manga_id = $_POST['manga_id'];
     $chapter_content = $_POST['chapter_content'];
 
+    // Gộp toàn bộ nội dung thành 1 đoạn duy nhất bằng cách loại bỏ các thẻ <p> mở và đóng
+    $chapter_content = str_replace('<p>', '', $chapter_content);
+    $chapter_content = str_replace('</p>', '', $chapter_content);
+
+    // Thêm thẻ bao quanh duy nhất (ví dụ như <p>)
+    $chapter_content = '<p>' . $chapter_content . '</p>';
+
     // Chuẩn bị câu truy vấn INSERT để thêm dữ liệu vào bảng chapter
     $query = "INSERT INTO chapter (chapter_name, manga_id, chapter_content, update_at) VALUES (?, ?, ?, NOW())";
     $stmt = $conn->prepare($query);
@@ -169,7 +176,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     { name: 'tools', items: ['Maximize', 'ShowBlocks'] },
                     { name: 'document', items: ['Source', 'Preview', 'Print'] }
                 ],
-                height: 300
+                height: 300,
+                enterMode: CKEDITOR.ENTER_BR,  // Thay vì tạo <p>, CKEditor sẽ dùng <br> khi nhấn Enter
+                shiftEnterMode: CKEDITOR.ENTER_P  // Shift + Enter sẽ vẫn tạo thẻ <p>
             });
         </script>
 
