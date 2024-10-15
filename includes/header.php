@@ -1,5 +1,5 @@
 <?php
-session_start(); // Bắt đầu phiên làm việc
+// session_start(); // Bắt đầu phiên làm việc
 include('config/db_connection.php');
 
 // Truy vấn lấy các thể loại và danh sách thịnh hành
@@ -131,41 +131,3 @@ if ($result_trending && $result_trending->num_rows > 0) {
         </ul>
     </nav>
 </header>
-<script>
-    // Hàm để tạo khoảng thời gian ngẫu nhiên từ 3 đến 10 phút
-    function getRandomTime() {
-        const min = 3 * 60 * 1000; // 3 phút
-        const max = 10 * 60 * 1000; // 10 phút
-        return Math.floor(Math.random() * (max - min + 1)) + min;
-    }
-
-    // Hàm để lấy link ngẫu nhiên từ server và mở nó trong tab mới
-    function fetchAndOpenAffiliateLink() {
-        fetch('get_random_affiliate_link.php') // Gửi yêu cầu tới file PHP
-            .then(response => response.json()) // Chuyển đổi phản hồi thành JSON
-            .then(link => {
-                if (link) {
-                    window.open(link, '_blank'); // Mở link trong tab mới
-                } else {
-                    console.log('Không có link nào để mở.');
-                }
-            })
-            .catch(error => console.error('Lỗi khi lấy dữ liệu:', error));
-    }
-
-    // Hàm để thực hiện quá trình lặp lại sau thời gian ngẫu nhiên
-    function startRandomInterval() {
-        const randomTime = getRandomTime();
-        console.log(`Lấy link sau ${randomTime / 1000 / 60} phút.`);
-        
-        setTimeout(() => {
-            fetchAndOpenAffiliateLink(); // Gọi hàm lấy link
-            startRandomInterval(); // Lặp lại quá trình
-        }, randomTime);
-    }
-
-    // Bắt đầu quá trình khi trang load
-    window.onload = function() {
-        startRandomInterval();
-    }
-</script>

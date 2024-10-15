@@ -52,6 +52,8 @@ while ($row = $result->fetch_assoc()) {
     <link href="assets/image/logo.ico" rel="shortcut icon" type="image/png">
     <meta content="903289929360-7umpc2inp7iov7sbsmnrmpiai16onig9.apps.googleusercontent.com" name="google-signin-client_id" />
     </link>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
     </meta>
     </meta>
 </head>

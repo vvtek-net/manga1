@@ -1,9 +1,14 @@
 <?php
 
-
 include('config/db_connection.php');
 
-// Kiểm tra xem GET có tồn tại không
+// Số lượng mục hiển thị trên mỗi trang
+$limit = 10;
+
+// Xác định trang hiện tại từ URL, nếu không có thì mặc định là trang 1
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$offset = ($page - 1) * $limit;
+
 $manga_type = isset($_GET['type_id']) ? $_GET['type_id'] : null;
 $manga_trending = isset($_GET['trending_id']) ? $_GET['trending_id'] : null;
 $type_name = isset($_GET['type_name']) ? $_GET['type_name'] : null;
@@ -18,18 +23,19 @@ try {
 
     if ($manga_type !== null) {
         // Truy vấn theo thể loại
-        $query = "SELECT * FROM manga WHERE type_id = ? ORDER BY update_at DESC";
+        $query = "SELECT * FROM manga WHERE type_id = ? ORDER BY update_at DESC LIMIT ? OFFSET ?";
         $stmt = $conn->prepare($query);
-        $stmt->bind_param("i", $manga_type);
+        $stmt->bind_param("iii", $manga_type, $limit, $offset);
     } elseif ($manga_trending !== null) {
         // Truy vấn theo thịnh hành
-        $query = "SELECT * FROM manga WHERE trending_id = ? ORDER BY update_at DESC";
+        $query = "SELECT * FROM manga WHERE trending_id = ? ORDER BY update_at DESC LIMIT ? OFFSET ?";
         $stmt = $conn->prepare($query);
-        $stmt->bind_param("i", $manga_trending);
+        $stmt->bind_param("iii", $manga_trending, $limit, $offset);
     } else {
         // Nếu không có gì được truyền vào URL, thực hiện truy vấn toàn bộ manga
-        $query = "SELECT * FROM manga ORDER BY update_at DESC";
+        $query = "SELECT * FROM manga ORDER BY update_at DESC LIMIT ? OFFSET ?";
         $stmt = $conn->prepare($query);
+        $stmt->bind_param("ii", $limit, $offset);
     }
 
     if ($stmt) {
@@ -37,17 +43,31 @@ try {
         $result = $stmt->get_result();
 
         if ($result->num_rows > 0) {
-            // Lưu kết quả vào mảng để hiển thị
             $mangas = [];
             while ($row = $result->fetch_assoc()) {
                 $mangas[] = $row;
             }
+        }
 
-            // Ví dụ: hiển thị tên các manga
-            foreach ($mangas as $manga) {
-            }
+        // Truy vấn tổng số manga để tính tổng số trang
+        if ($manga_type !== null) {
+            $count_query = "SELECT COUNT(*) AS total FROM manga WHERE type_id = ?";
+            $count_stmt = $conn->prepare($count_query);
+            $count_stmt->bind_param("i", $manga_type);
+        } elseif ($manga_trending !== null) {
+            $count_query = "SELECT COUNT(*) AS total FROM manga WHERE trending_id = ?";
+            $count_stmt = $conn->prepare($count_query);
+            $count_stmt->bind_param("i", $manga_trending);
         } else {
-            
+            $count_query = "SELECT COUNT(*) AS total FROM manga";
+            $count_stmt = $conn->prepare($count_query);
+        }
+
+        if ($count_stmt) {
+            $count_stmt->execute();
+            $count_result = $count_stmt->get_result();
+            $total = $count_result->fetch_assoc()['total'];
+            $total_pages = ceil($total / $limit); // Tổng số trang
         }
     } else {
         throw new Exception("Lỗi khi chuẩn bị truy vấn.");
@@ -56,6 +76,7 @@ try {
     echo "<p>Lỗi: " . $e->getMessage() . "</p>";
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="vi">
@@ -93,7 +114,41 @@ try {
     <link rel="stylesheet" href="cdn/cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" />
     <link rel="shortcut icon" type="image/png" href="assets/image/logo.ico">
     <meta name="google-signin-client_id" content="903289929360-7umpc2inp7iov7sbsmnrmpiai16onig9.apps.googleusercontent.com">
-    
+    <style>
+        .pagination {
+    text-align: center;
+    margin-top: 20px; /* Khoảng cách phía trên phân trang */
+}
+
+.pagination-list {
+    list-style-type: none;
+    padding: 0;
+    display: inline-block;
+}
+
+.pagination-list li {
+    display: inline;
+    margin: 0 5px;
+}
+
+.pagination-list li a {
+    padding: 8px 12px;
+    background-color: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+}
+
+.pagination-list li a:hover {
+    background-color: #0056b3;
+}
+
+.pagination-list li.active a {
+    background-color: #0056b3;
+    pointer-events: none;
+}
+
+    </style>
 </head>
 
 
@@ -348,13 +403,46 @@ try {
                                         }
 
                                         ?>
-                                    </div>
+                                    
                                     <div class="pagination">
-                                        <!-- Phân trang -->
-                                    </div>
+    <?php if ($total_pages > 1): ?>
+        <ul class="pagination-list">
+            <?php
+            // Tạo một bản sao của mảng $_GET và loại bỏ tham số 'page'
+            $queryParams = $_GET;
+            unset($queryParams['page']);
+            ?>
+
+            <!-- Nút Previous -->
+            <?php if ($page > 1): ?>
+                <li>
+                    <a href="?page=<?= max(1, $page - 1) ?>&<?= http_build_query($queryParams) ?>">Previous</a>
+                </li>
+            <?php endif; ?>
+
+            <!-- Hiển thị danh sách các trang -->
+            <?php for ($i = 1; $i <= $total_pages; $i++): ?>
+                <li class="<?= ($i == $page) ? 'active' : '' ?>">
+                    <a href="?page=<?= $i ?>&<?= http_build_query($queryParams) ?>"><?= $i ?></a>
+                </li>
+            <?php endfor; ?>
+
+            <!-- Nút Next -->
+            <?php if ($page < $total_pages): ?>
+                <li>
+                    <a href="?page=<?= min($total_pages, $page + 1) ?>&<?= http_build_query($queryParams) ?>">Next</a>
+                </li>
+            <?php endif; ?>
+        </ul>
+    <?php endif; ?>
+</div>
+
+
                                 </div>
 
                             </div>
+
+                        </div>
                 </main>
                 <script>
                     document.getElementById('show-dropdown').addEventListener('click', function() {
