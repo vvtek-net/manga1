@@ -1,4 +1,14 @@
 <?php
+
+// Đặt header cho phép yêu cầu từ bất kỳ nguồn gốc nào (có thể thay thế '*' bằng một domain cụ thể)
+header("Access-Control-Allow-Origin: *");
+
+// Nếu cần chấp nhận các phương thức HTTP cụ thể
+header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
+
+// Nếu bạn cần chấp nhận các header cụ thể từ client
+header("Access-Control-Allow-Headers: Content-Type, Authorization");
+
 include 'config/db_connection.php';
 
 // Lấy ngẫu nhiên một liên kết từ bảng manga_affiliate
@@ -11,4 +21,3 @@ if ($result->num_rows > 0) {
 } else {
     echo json_encode(['aff_link' => null]);
 }
-?>
