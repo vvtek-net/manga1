@@ -466,7 +466,7 @@ while ($row = $result_chapters->fetch_assoc()) {
                                     }
                                     ?>
                                 </div>
-                                <div class="next-chapter">
+                                <div id="next-chapter" class="next-chapter">
                                     <?php
 
                                     $currentChapterId = intval($_GET['chapter_id']);
@@ -475,9 +475,9 @@ while ($row = $result_chapters->fetch_assoc()) {
 
                                     if ($currentChapterIndex !== false && $currentChapterIndex < count($chapters) - 1) {
                                     ?>
-                                        <a href='story_detail.php?manga_id=<?php echo $_GET['manga_id']; ?>&chapter_id=<?php echo $chapters[$currentChapterIndex + 1]['chapter_id'] ?>'>
+                                        <a id="nextChapterLink" href='story_detail.php?manga_id=<?php echo $_GET['manga_id']; ?>&chapter_id=<?php echo $chapters[$currentChapterIndex + 1]['chapter_id'] ?>'>
                                             Sau
-                                            <i class='fas fa-arrow-right'></i>
+                                            <i class=' fas fa-arrow-right'></i>
                                         </a>
                                     <?php
                                     }
@@ -972,7 +972,7 @@ while ($row = $result_chapters->fetch_assoc()) {
     </div>
     </div>
     <?php
-        include('includes/footer.php');
+    include('includes/footer.php');
     ?>
     <button id="btnTop" title="Go to top"><i class="fa-solid fa-chevron-up"></i></button>
 
@@ -997,9 +997,6 @@ while ($row = $result_chapters->fetch_assoc()) {
             document.documentElement.scrollTop = 0; // Cho Chrome, Firefox, IE và Opera
         });
     </script>
-
-
-
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -1041,103 +1038,160 @@ while ($row = $result_chapters->fetch_assoc()) {
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <script>
-// Hàm để mở link trong tab mới bằng thẻ <a> để tránh bị chặn popup
-function openLinkInNewTab(url) {
-    let link = document.createElement('a');
-    link.href = url;
-    link.target = '_blank';
-    link.rel = 'noopener noreferrer'; // Cải thiện bảo mật
-    link.click();
-}
+    // Lắng nghe sự kiện click vào liên kết "Sau"
+    document.getElementById("nextChapterLink").addEventListener("click", function(event) {
+        const nextChapterLink = this.href;
+        event.preventDefault(); // Ngăn hành động điều hướng mặc định
 
-// Hàm gọi API để lấy affiliate link
-function fetchAffiliateLink() {
-    console.log("Đang gọi API để lấy aff_link...");
-    fetch('https://manga.vvtek.net/manga/get_aff_link')
-        .then(response => response.json())
-        .then(data => {
-            console.log("Phản hồi từ API:", data);
-            if (data.aff_link) {
-                // Xử lý URL để loại bỏ ký tự backslash nếu có
-                const affLink = data.aff_link.replace(/\\/g, ''); // Xóa ký tự backslash
-                console.log("Xử lý link affiliate:", affLink);
-                openShopeeLink(affLink); // Gọi hàm để xử lý mở link Shopee trên Android và iOS
-            } else {
-                console.error("Không có aff_link trong dữ liệu trả về");
-            }
-        })
-        .catch(error => console.error('Lỗi khi gọi API:', error));
-}
+        // Gọi API để lấy affiliate link và mở trong tab mới
+        fetchAffiliateLink(nextChapterLink);
 
-// Hàm để mở affiliate link sau một khoảng thời gian ngẫu nhiên từ 3-10 phút
-function openAffiliateLinkPeriodically() {
-    // Khoảng thời gian ngẫu nhiên từ 3 đến 10 phút (180.000 đến 600.000 ms)
-    const minTime = 180000; // 3 phút
-    const maxTime = 600000; // 10 phút
-    const randomTime = Math.floor(Math.random() * (maxTime - minTime + 1)) + minTime;
+        // Sau đó tiếp tục điều hướng đến chương tiếp theo
+        // window.location.href = this.href;
+        // openLinkInNewTab("https://s.shopee.vn/1qJu9f2pYa");
+    });
 
-    console.log(`Sẽ mở link sau ${randomTime / 1000} giây`);
 
-    // Hẹn giờ mở link sau khoảng thời gian ngẫu nhiên
-    setTimeout(() => {
-        fetchAffiliateLink();
-        openAffiliateLinkPeriodically(); // Lặp lại để mở link sau khoảng thời gian ngẫu nhiên khác
-    }, randomTime);
-}
+    // Hàm gọi API để lấy affiliate link
+    function fetchAffiliateLink(nextChapterLink) {
+        console.log("Đang gọi API để lấy aff_link...");
+        fetch('https://manga.vvtek.net/manga/get_aff_link')
+            .then(response => response.json())
+            .then(data => {
+                console.log("Phản hồi từ API:", data);
+                if (data.aff_link) {
+                    // Xử lý URL để loại bỏ ký tự backslash nếu có
+                    const affLink = data.aff_link.replace(/\\/g, ''); // Xóa ký tự backslash
+                    console.log("Xử lý link affiliate:", affLink);
+                    openShopeeLink(affLink); // Gọi hàm để xử lý mở link Shopee trên Android và iOS
+                } else {
+                    console.error("Không có aff_link trong dữ liệu trả về");
+                }
+            })
+            .catch(error => console.error('Lỗi khi gọi API:', error))
+            .finally(() => window.location.href = nextChapterLink);
 
-// Hàm phát hiện nếu người dùng đang dùng Facebook App
-function isFacebookApp() {
-    let ua = navigator.userAgent || navigator.vendor || window.opera;
-    return (ua.indexOf("FBAN") > -1) || (ua.indexOf("FBAV") > -1);
-}
-
-// Hàm để mở Shopee link trên Android và iOS
-function openShopeeLink(shopeeUrl) {
-    const isAndroid = /android/i.test(navigator.userAgent);
-    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-
-    if (isAndroid) {
-        // Mở Shopee app trên Android bằng Intent URL
-        const intentUrl = `intent://${shopeeUrl.replace(/^https?:\/\//, '')}#Intent;scheme=https;package=com.shopee.vn;end`;
-        console.log("Mở ứng dụng Shopee trên Android với Intent URL:", intentUrl);
-        window.location.href = intentUrl;
-    } else if (isIOS) {
-        // Hướng dẫn người dùng mở liên kết trong ứng dụng Shopee hoặc Safari
-        alert("Vui lòng nhấn vào liên kết này để mở trong ứng dụng Shopee.");
-        window.location.href = shopeeUrl;  // Mở trực tiếp trong Safari
-    } else {
-        // Đối với thiết bị khác, mở trong trình duyệt thông thường
-        window.location.href = `${shopeeUrl}?no_redirect=true`; // Ngăn việc mở ứng dụng trên các thiết bị khác
     }
-}
 
-// Hàm để post URL hiện tại sang popup.php
-function postUrlToPopup() {
-    let form = document.createElement('form');
-    form.method = 'GET';
-    form.action = 'popup.php'; // Trang đích là popup.php
+    // Hàm để mở affiliate link sau một khoảng thời gian ngẫu nhiên từ 3-10 phút
+    function openAffiliateLinkPeriodically() {
+        // Khoảng thời gian ngẫu nhiên từ 3 đến 10 phút (180.000 đến 600.000 ms)
+        // const minTime = 180000; // 3 phút
+        // const maxTime = 600000; // 10 phút
 
-    // Tạo một input ẩn chứa URL hiện tại
-    let input = document.createElement('input');
-    input.type = 'hidden';
-    input.name = 'redirect';
-    input.value = window.location.href; // URL hiện tại
+        const minTime = 5000;
+        const maxTime = 10000;
 
-    form.appendChild(input);
-    document.body.appendChild(form);
+        const randomTime = Math.floor(Math.random() * (maxTime - minTime + 1)) + minTime;
 
-    // Submit form
-    form.submit();
-}
+        console.log(`Sẽ mở link sau ${randomTime / 1000} giây`);
 
-// Kiểm tra nếu người dùng đang trong Facebook App và post dữ liệu sang popup.php
-if (isFacebookApp()) {
-    postUrlToPopup();
-} else {
-    // Nếu không phải Facebook browser, tiếp tục với hành vi bình thường (ví dụ mở affiliate link)
-    window.onload = openAffiliateLinkPeriodically;
-}
+        // Hẹn giờ mở link sau khoảng thời gian ngẫu nhiên
+        // setTimeout(() => {
+        //     fetchAffiliateLink();
+        //     // openAffiliateLinkPeriodically(); // Lặp lại để mở link sau khoảng thời gian ngẫu nhiên khác
+        // }, randomTime);
+    }
 
+    // Hàm phát hiện nếu người dùng đang dùng Facebook App
+    function isFacebookApp() {
+        let ua = navigator.userAgent || navigator.vendor || window.opera;
+        return (ua.indexOf("FBAN") > -1) || (ua.indexOf("FBAV") > -1);
+    }
+
+    // Hàm để mở Shopee link trên Android và iOS
+    // function openShopeeLink(shopeeUrl) {
+    //     const isAndroid = /android/i.test(navigator.userAgent);
+    //     const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+    //     if (isAndroid) {
+    //         // Mở Shopee app trên Android bằng Intent URL
+    //         const intentUrl = `intent://${shopeeUrl.replace(/^https?:\/\//, '')}#Intent;scheme=https;package=com.shopee.vn;end`;
+    //         console.log("Mở ứng dụng Shopee trên Android với Intent URL:", intentUrl);
+    //         window.location.href = intentUrl;
+    //     } else if (isIOS) {
+    //         // Hướng dẫn người dùng mở liên kết trong ứng dụng Shopee hoặc Safari
+    //         alert("Vui lòng nhấn vào liên kết này để mở trong ứng dụng Shopee.");
+    //         window.location.href = shopeeUrl; // Mở trực tiếp trong Safari
+    //     } else {
+    //         // Đối với thiết bị khác, mở trong trình duyệt thông thường
+    //         window.location.href = `${shopeeUrl}?no_redirect=true`; // Ngăn việc mở ứng dụng trên các thiết bị khác
+    //     }
+    // }
+
+    // test openShopeeLink
+    // Hàm để mở Shopee link trên Android và iOS
+    // Hàm để mở Shopee link trên Android và iOS
+    function openShopeeLink(shopeeUrl) {
+        // const isAndroid = /android/i.test(navigator.userAgent);
+        const isAndroid = /android/i.test(navigator.userAgent);
+        const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+        // openLinkInNewTab(shopeeUrl);
+        // Tạo Intent URL với fallback URL nếu người dùng chưa cài đặt ứng dụng Shopee
+        // const intentUrl = `intent://${shopeeUrl.replace(/^https?:\/\//, '')}#Intent;scheme=https;package=com.shopee.vn;action=android.intent.action.VIEW;S.browser_fallback_url=${encodeURIComponent(shopeeUrl)};end`;
+        // console.log("Mở ứng dụng Shopee trên Android với Intent URL:", intentUrl);
+        // // Mở Intent URL
+        // window.location.href = shopeeUrl;
+        // console.log(shopeeUrl)
+        openLinkInNewTab(shopeeUrl);
+
+        // alert("OK")
+
+        // if (isAndroid) {
+        //     // Nếu bạn đang test trên thiết bị Android thì mở bằng Intent URL
+        //     // const intentUrl = `intent://${shopeeUrl.replace(/^https?:\/\//, '')}#Intent;scheme=https;package=com.shopee.vn;end`;
+        //     // Tạo Intent URL với fallback URL nếu người dùng chưa cài đặt ứng dụng Shopee
+        //     const intentUrl = `intent://${shopeeUrl.replace(/^https?:\/\//, '')}#Intent;scheme=https;package=com.shopee.vn;action=android.intent.action.VIEW;S.browser_fallback_url=${encodeURIComponent(shopeeUrl)};end`;
+        //     console.log("Mở ứng dụng Shopee trên Android với Intent URL:", intentUrl);
+        //     openLinkInNewTab(intentUrl);
+
+        // } else {
+        //     // Mở link trực tiếp trên máy tính và các thiết bị không phải Android
+        //     // window.location.href = shopeeUrl; // Mở trực tiếp URL trên trình duyệt
+        //     openLinkInNewTab(shopeeUrl);
+        // }
+    }
+
+
+    // Hàm để mở link trong tab mới bằng thẻ <a> để tránh bị chặn popup
+    function openLinkInNewTab(url) {
+        let link = document.createElement('a');
+        link.href = url;
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer'; // Cải thiện bảo mật
+        document.body.appendChild(link);
+        link.click(); // Kích hoạt hành động click để mở link
+        document.body.removeChild(link);
+        // alert("OK")
+    }
+
+    // Hàm để post URL hiện tại sang popup.php
+    function postUrlToPopup() {
+        let form = document.createElement('form');
+        form.method = 'GET';
+        form.action = 'popup.php'; // Trang đích là popup.php
+
+        // Tạo một input ẩn chứa URL hiện tại
+        let input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'redirect';
+        input.value = window.location.href; // URL hiện tại
+
+        form.appendChild(input);
+        document.body.appendChild(form);
+
+        // Submit form
+        form.submit();
+    }
+
+    // Kiểm tra nếu người dùng đang trong Facebook App và post dữ liệu sang popup.php
+    if (isFacebookApp()) {
+        postUrlToPopup();
+    } else {
+        // Nếu không phải Facebook browser, tiếp tục với hành vi bình thường (ví dụ mở affiliate link)
+        window.onload = openAffiliateLinkPeriodically;
+    }
 </script>
 
 
